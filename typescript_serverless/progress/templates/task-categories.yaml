@@ -1,0 +1,50 @@
+categories:
+  01_initial_setup:
+    description: 'Project initialization and configuration'
+    tasks:
+      - 01-01: 'Repository setup'
+      - 01-02: 'Development environment'
+      - 01-03: 'CI/CD pipeline'
+
+  02_core_infrastructure:
+    description: 'AWS CDK and infrastructure setup'
+    tasks:
+      - 02-01: 'CDK project structure'
+      - 02-02: 'CloudFront + S3'
+      - 02-03: 'API Gateway + Lambda'
+      - 02-04: 'DynamoDB tables'
+
+  03_shared_libraries:
+    description: 'Common utilities and patterns'
+    tasks:
+      - 03-01: 'Type definitions'
+      - 03-02: 'Clean Architecture layers'
+      - 03-03: 'GoF patterns implementation'
+
+  04_authentication:
+    description: 'Google OAuth and JWT'
+    tasks:
+      - 04-01: 'OAuth flow'
+      - 04-02: 'JWT management'
+      - 04-03: 'User session handling'
+
+  05_api_development:
+    description: 'REST API implementation'
+    tasks:
+      - 05-01: 'Zod schemas'
+      - 05-02: 'API handlers'
+      - 05-03: 'OpenAPI generation'
+
+  06_frontend:
+    description: 'Next.js UI implementation'
+    tasks:
+      - 06-01: 'Layout and routing'
+      - 06-02: 'shadcn/ui components'
+      - 06-03: 'State management'
+
+  07_testing:
+    description: 'Test implementation'
+    tasks:
+      - 07-01: 'Unit tests'
+      - 07-02: 'Integration tests'
+      - 07-03: 'E2E tests'
