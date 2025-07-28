@@ -86,9 +86,10 @@ export const mask = (str: string, visibleChars = 3): string => {
  */
 export const getInitials = (name: string): string => {
   return name
-    .split(' ')
+    .trim()
+    .split(/\s+/)
+    .filter((word) => word.length > 0)
     .map((word) => word.charAt(0))
     .join('')
-    .toUpperCase()
-    .slice(0, 2);
+    .toUpperCase();
 };

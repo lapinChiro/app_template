@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import {
   formatDate,
   formatDateTime,
@@ -15,12 +17,12 @@ describe('date utilities', () => {
   
   beforeAll(() => {
     // Mock current date for isPast/isFuture tests
-    jest.useFakeTimers();
-    jest.setSystemTime(new Date('2024-01-20T00:00:00.000Z'));
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-01-20T00:00:00.000Z'));
   });
 
   afterAll(() => {
-    jest.useRealTimers();
+    vi.useRealTimers();
   });
 
   describe('formatDate', () => {

@@ -130,27 +130,24 @@ module.exports = [
     },
   },
 
-  // Test files configuration
+  // Test files configuration - same quality standards as production code
   {
     files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: './tsconfig.test.json',
+        project: true,
         tsconfigRootDir: __dirname,
+        ecmaVersion: 2022,
+        sourceType: 'module',
       },
     },
     rules: {
-      '@typescript-eslint/explicit-function-return-type': 'off',
-      '@typescript-eslint/explicit-module-boundary-types': 'off',
-      '@typescript-eslint/no-unsafe-assignment': 'off',
-      '@typescript-eslint/no-unsafe-call': 'off',
-      '@typescript-eslint/no-unsafe-member-access': 'off',
-      '@typescript-eslint/no-unsafe-argument': 'off',
-      'no-console': 'off',
-      'max-lines-per-function': 'off',
-      'max-lines': ['error', { max: 500 }],
-      complexity: ['error', 25],
+      // Test code is specification - apply same quality standards as production
+      'no-console': 'off', // Allow console.log for debugging during test development
+      'max-lines-per-function': ['error', { max: 200 }], 
+      'max-lines': ['error', { max: 300 }], // Same as production
+      complexity: ['error', 15], // Same as production
     },
   },
 
@@ -168,13 +165,15 @@ module.exports = [
       'jest.config.base.js',
       'jest.setup.ts',
       '**/jest.setup.ts',
-      'vitest.config.ts',
+      '**/vitest.config.ts',
       'cypress.config.ts',
       '.eslintrc.js',
       'eslint.config.js',
       '**/*.d.ts',
-      '**/*.test.ts',
-      '**/*.spec.ts',
+      'cdk.out/**',
+      '.serverless/**',
+      'tmp/**',
+      'temp/**',
     ],
   },
 

@@ -61,8 +61,6 @@
     { "path": "./packages/shared" },
     { "path": "./packages/ui" },
     { "path": "./packages/infra" },
-    { "path": "./apps/web-member" },
-    { "path": "./apps/web-admin" },
     { "path": "./apps/api-member" },
     { "path": "./apps/api-admin" }
   ],
@@ -72,8 +70,6 @@
     "dist",
     "build",
     ".next",
-    "coverage",
-    "**/*.spec.ts",
-    "**/*.test.ts"
+    "coverage"
   ]
 }

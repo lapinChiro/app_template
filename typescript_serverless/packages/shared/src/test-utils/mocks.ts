@@ -1,3 +1,5 @@
+import { vi } from 'vitest';
+
 import type { AuthUser, JwtPayload } from '../types/api';
 import type { HasId, PaginatedResponse, PaginationParams } from '../types/common';
 
@@ -15,17 +17,17 @@ export interface Repository<T extends HasId> {
 }
 
 /**
- * Create a mock repository with Jest
+ * Create a mock repository with Vitest
  */
-export function createMockRepository<T extends HasId>(): jest.Mocked<Repository<T>> {
+export function createMockRepository<T extends HasId>(): Repository<T> {
   return {
-    findById: jest.fn(),
-    findAll: jest.fn(),
-    findPaginated: jest.fn(),
-    create: jest.fn(),
-    update: jest.fn(),
-    delete: jest.fn(),
-    exists: jest.fn(),
+    findById: vi.fn(),
+    findAll: vi.fn(),
+    findPaginated: vi.fn(),
+    create: vi.fn(),
+    update: vi.fn(),
+    delete: vi.fn(),
+    exists: vi.fn(),
   };
 }
 
@@ -43,14 +45,14 @@ export function mockApiResponse<T>(data: T, status = 200): Response {
     redirected: false,
     type: 'basic',
     url: '',
-    clone: jest.fn().mockReturnThis(),
+    clone: vi.fn().mockReturnThis(),
     body: null,
     bodyUsed: false,
-    arrayBuffer: jest.fn().mockResolvedValue(new ArrayBuffer(0)),
-    blob: jest.fn().mockResolvedValue(new Blob([JSON.stringify(data)])),
-    formData: jest.fn().mockResolvedValue(new FormData()),
-    json: jest.fn().mockResolvedValue(data),
-    text: jest.fn().mockResolvedValue(JSON.stringify(data)),
+    arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(0)),
+    blob: vi.fn().mockResolvedValue(new Blob([JSON.stringify(data)])),
+    formData: vi.fn().mockResolvedValue(new FormData()),
+    json: vi.fn().mockResolvedValue(data),
+    text: vi.fn().mockResolvedValue(JSON.stringify(data)),
   } as unknown as Response;
 }
 
@@ -113,10 +115,10 @@ export function mockLambdaContext(overrides?: Partial<LambdaContext>): LambdaCon
     awsRequestId: 'test-request-id',
     logGroupName: '/aws/lambda/test-function',
     logStreamName: '2024/01/01/[$LATEST]test-stream',
-    getRemainingTimeInMillis: jest.fn().mockReturnValue(30000),
-    done: jest.fn(),
-    fail: jest.fn(),
-    succeed: jest.fn(),
+    getRemainingTimeInMillis: vi.fn().mockReturnValue(30000),
+    done: vi.fn(),
+    fail: vi.fn(),
+    succeed: vi.fn(),
     ...overrides,
   };
 }
@@ -171,31 +173,31 @@ export function mockApiGatewayEvent(overrides?: Partial<ApiGatewayEvent>): ApiGa
 /**
  * Mock DynamoDB client
  */
-export function createMockDynamoDBClient(): Record<string, jest.Mock> {
+export function createMockDynamoDBClient(): Record<string, ReturnType<typeof vi.fn>> {
   return {
-    get: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    put: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    update: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    delete: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    query: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    scan: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    batchGet: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    batchWrite: jest.fn().mockReturnValue({ promise: jest.fn() }),
+    get: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    put: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    update: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    delete: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    query: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    scan: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    batchGet: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    batchWrite: vi.fn().mockReturnValue({ promise: vi.fn() }),
   };
 }
 
 /**
  * Mock S3 client
  */
-export function createMockS3Client(): Record<string, jest.Mock> {
+export function createMockS3Client(): Record<string, ReturnType<typeof vi.fn>> {
   return {
-    getObject: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    putObject: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    deleteObject: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    listObjectsV2: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    headObject: jest.fn().mockReturnValue({ promise: jest.fn() }),
-    getSignedUrl: jest.fn(),
-    getSignedUrlPromise: jest.fn(),
+    getObject: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    putObject: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    deleteObject: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    listObjectsV2: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    headObject: vi.fn().mockReturnValue({ promise: vi.fn() }),
+    getSignedUrl: vi.fn(),
+    getSignedUrlPromise: vi.fn(),
   };
 }
 

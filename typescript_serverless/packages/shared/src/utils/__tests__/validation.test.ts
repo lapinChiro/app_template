@@ -1,4 +1,14 @@
 import {
+  runValidationTests,
+  testValidationBatch,
+  emailTestCases,
+  urlTestCases,
+  phoneTestCases,
+  postalCodeTestCases,
+  creditCardTestCases,
+} from '../../test-utils/validation-helpers';
+import type { ValidationTestCase } from '../../test-utils/validation-helpers';
+import {
   isEmail,
   isURL,
   isPhoneNumber,
@@ -14,132 +24,60 @@ import {
 
 describe('validation utilities', () => {
   describe('isEmail', () => {
-    it('should validate correct email formats', () => {
-      expect(isEmail('test@example.com')).toBe(true);
-      expect(isEmail('user.name@example.co.jp')).toBe(true);
-      expect(isEmail('user+tag@example.com')).toBe(true);
-      expect(isEmail('user_name@example-domain.com')).toBe(true);
-    });
-
-    it('should reject invalid email formats', () => {
-      expect(isEmail('invalid.email')).toBe(false);
-      expect(isEmail('@example.com')).toBe(false);
-      expect(isEmail('user@')).toBe(false);
-      expect(isEmail('user @example.com')).toBe(false);
-      expect(isEmail('user@example')).toBe(false);
-      expect(isEmail('')).toBe(false);
-    });
-
-    it('should handle edge cases', () => {
-      expect(isEmail('a@b.c')).toBe(true);
-      expect(isEmail('test@localhost')).toBe(false);
-      expect(isEmail('test@192.168.1.1')).toBe(true);
-    });
+    runValidationTests(isEmail, emailTestCases.valid, emailTestCases.invalid);
   });
 
   describe('isURL', () => {
-    it('should validate correct URL formats', () => {
-      expect(isURL('https://example.com')).toBe(true);
-      expect(isURL('http://example.com')).toBe(true);
-      expect(isURL('https://example.com/path')).toBe(true);
-      expect(isURL('https://example.com:8080')).toBe(true);
-      expect(isURL('https://sub.example.com')).toBe(true);
-      expect(isURL('https://example.com/path?query=value')).toBe(true);
-    });
-
-    it('should reject invalid URL formats', () => {
-      expect(isURL('example.com')).toBe(false);
-      expect(isURL('ftp://example.com')).toBe(false);
-      expect(isURL('https://')).toBe(false);
-      expect(isURL('https://example')).toBe(false);
-      expect(isURL('')).toBe(false);
-      expect(isURL('not a url')).toBe(false);
-    });
-
-    it('should handle edge cases', () => {
-      expect(isURL('https://localhost')).toBe(true);
-      expect(isURL('https://192.168.1.1')).toBe(true);
-      expect(isURL('https://example.com:65535')).toBe(true);
-    });
+    runValidationTests(isURL, urlTestCases.valid, urlTestCases.invalid);
   });
 
   describe('isPhoneNumber', () => {
-    it('should validate Japanese phone numbers', () => {
-      expect(isPhoneNumber('090-1234-5678')).toBe(true);
-      expect(isPhoneNumber('080-1234-5678')).toBe(true);
-      expect(isPhoneNumber('070-1234-5678')).toBe(true);
-      expect(isPhoneNumber('03-1234-5678')).toBe(true);
-      expect(isPhoneNumber('06-1234-5678')).toBe(true);
-      expect(isPhoneNumber('09012345678')).toBe(true);
-      expect(isPhoneNumber('0312345678')).toBe(true);
-    });
-
-    it('should reject invalid phone numbers', () => {
-      expect(isPhoneNumber('123-456-7890')).toBe(false);
-      expect(isPhoneNumber('090-123-456')).toBe(false);
-      expect(isPhoneNumber('1234567890')).toBe(false);
-      expect(isPhoneNumber('')).toBe(false);
-      expect(isPhoneNumber('phone number')).toBe(false);
-    });
+    runValidationTests(isPhoneNumber, phoneTestCases.valid, phoneTestCases.invalid);
   });
 
   describe('isPostalCode', () => {
-    it('should validate Japanese postal codes', () => {
-      expect(isPostalCode('123-4567')).toBe(true);
-      expect(isPostalCode('1234567')).toBe(true);
-      expect(isPostalCode('000-0000')).toBe(true);
-      expect(isPostalCode('999-9999')).toBe(true);
-    });
-
-    it('should reject invalid postal codes', () => {
-      expect(isPostalCode('12-3456')).toBe(false);
-      expect(isPostalCode('123-456')).toBe(false);
-      expect(isPostalCode('12345678')).toBe(false);
-      expect(isPostalCode('abc-defg')).toBe(false);
-      expect(isPostalCode('')).toBe(false);
-    });
+    runValidationTests(isPostalCode, postalCodeTestCases.valid, postalCodeTestCases.invalid);
   });
 
   describe('isCreditCard', () => {
-    it('should validate credit card numbers using Luhn algorithm', () => {
-      expect(isCreditCard('4532015112830366')).toBe(true); // Visa
-      expect(isCreditCard('5425233430109903')).toBe(true); // Mastercard
-      expect(isCreditCard('374245455400126')).toBe(true); // Amex
-      expect(isCreditCard('4532-0151-1283-0366')).toBe(true); // With dashes
-      expect(isCreditCard('4532 0151 1283 0366')).toBe(true); // With spaces
+    describe('valid credit card numbers (Luhn algorithm)', () => {
+      creditCardTestCases.valid.forEach(({ number, type }) => {
+        it(`should accept ${type}: ${number}`, () => {
+          expect(isCreditCard(number)).toBe(true);
+        });
+      });
     });
 
-    it('should reject invalid credit card numbers', () => {
-      expect(isCreditCard('4532015112830367')).toBe(false); // Invalid checksum
-      expect(isCreditCard('1234567890123456')).toBe(false);
-      expect(isCreditCard('123')).toBe(false);
-      expect(isCreditCard('')).toBe(false);
-      expect(isCreditCard('not a card')).toBe(false);
+    describe('invalid credit card numbers', () => {
+      creditCardTestCases.invalid.forEach((number) => {
+        it(`should reject "${number}"`, () => {
+          expect(isCreditCard(number)).toBe(false);
+        });
+      });
     });
   });
 
   describe('isIPAddress', () => {
-    it('should validate IPv4 addresses', () => {
-      expect(isIPAddress('192.168.1.1')).toBe(true);
-      expect(isIPAddress('10.0.0.0')).toBe(true);
-      expect(isIPAddress('255.255.255.255')).toBe(true);
-      expect(isIPAddress('0.0.0.0')).toBe(true);
-    });
+    const ipTestCases: ValidationTestCase[] = [
+      // IPv4 valid
+      { input: '192.168.1.1', expected: true, description: 'should validate standard IPv4' },
+      { input: '10.0.0.0', expected: true, description: 'should validate private IPv4' },
+      { input: '255.255.255.255', expected: true, description: 'should validate max IPv4' },
+      { input: '0.0.0.0', expected: true, description: 'should validate zero IPv4' },
+      // IPv6 valid
+      { input: '2001:0db8:85a3:0000:0000:8a2e:0370:7334', expected: true, description: 'should validate full IPv6' },
+      { input: '2001:db8:85a3::8a2e:370:7334', expected: true, description: 'should validate compressed IPv6' },
+      { input: '::', expected: true, description: 'should validate IPv6 zero address' },
+      { input: '::1', expected: true, description: 'should validate IPv6 loopback' },
+      // Invalid
+      { input: '256.1.1.1', expected: false, description: 'should reject out-of-range IPv4' },
+      { input: '192.168.1', expected: false, description: 'should reject incomplete IPv4' },
+      { input: '192.168.1.1.1', expected: false, description: 'should reject too many octets' },
+      { input: 'example.com', expected: false, description: 'should reject domain names' },
+      { input: '', expected: false, description: 'should reject empty string' },
+    ];
 
-    it('should validate IPv6 addresses', () => {
-      expect(isIPAddress('2001:0db8:85a3:0000:0000:8a2e:0370:7334')).toBe(true);
-      expect(isIPAddress('2001:db8:85a3::8a2e:370:7334')).toBe(true);
-      expect(isIPAddress('::')).toBe(true);
-      expect(isIPAddress('::1')).toBe(true);
-    });
-
-    it('should reject invalid IP addresses', () => {
-      expect(isIPAddress('256.1.1.1')).toBe(false);
-      expect(isIPAddress('192.168.1')).toBe(false);
-      expect(isIPAddress('192.168.1.1.1')).toBe(false);
-      expect(isIPAddress('example.com')).toBe(false);
-      expect(isIPAddress('')).toBe(false);
-    });
+    testValidationBatch(isIPAddress, ipTestCases);
   });
 
   describe('isHexColor', () => {

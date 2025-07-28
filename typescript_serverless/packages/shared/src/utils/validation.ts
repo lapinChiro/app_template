@@ -10,10 +10,10 @@ export function isURL(url: string): boolean {
     const urlObj = new URL(url);
     const isValidProtocol = urlObj.protocol === 'http:' || urlObj.protocol === 'https:';
     const isLocalhost = urlObj.hostname === 'localhost';
-    const isIPAddress = /^(\d{1,3}\.){3}\d{1,3}$/.test(urlObj.hostname);
+    const isIP = /^(\d{1,3}\.){3}\d{1,3}$/.test(urlObj.hostname);
     const hasDomain = urlObj.hostname.includes('.');
     
-    return isValidProtocol && (isLocalhost || isIPAddress || hasDomain);
+    return isValidProtocol && (isLocalhost || isIP || hasDomain);
   } catch {
     return false;
   }
@@ -43,7 +43,8 @@ export function isCreditCard(number: string): boolean {
   let isEven = false;
   
   for (let i = cleaned.length - 1; i >= 0; i--) {
-    let digit = parseInt(cleaned[i], 10);
+    const char = cleaned.charAt(i);
+    let digit = parseInt(char, 10);
     
     if (isEven) {
       digit *= 2;

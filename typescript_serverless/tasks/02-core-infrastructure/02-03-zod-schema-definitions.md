@@ -1,3 +1,16 @@
+---
+task_id: '02-03'
+task_name: 'Zod Schema Definitions'
+task_status: 'completed'
+category: 'core-infrastructure'
+priority: 'high'
+estimated_hours: 3
+actual_hours: 0.4
+completed_at: '2025-07-28T16:00:00Z'
+depends_on: ['02-01']
+blocks_tasks: ['03-01', '03-02', '03-03']
+---
+
 # TASK-007: Zod Schema Definitions
 
 **Priority**: High  

@@ -54,30 +54,31 @@ export const deepClone = <T>(obj: T): T => {
  */
 export const deepMerge = <T extends Record<string, unknown>>(
   target: T,
-  ...sources: Array<Partial<T>>
+  ...sources: Array<Record<string, unknown>>
 ): T => {
   if (!sources.length) return target;
   const source = sources.shift();
+  const result = { ...target } as Record<string, unknown>;
 
-  if (isObject(target) && isObject(source)) {
+  if (isObject(result) && isObject(source)) {
     for (const key in source) {
       if (Object.prototype.hasOwnProperty.call(source, key)) {
         const sourceValue = source[key];
-        const targetValue = target[key];
+        const targetValue = result[key];
         
         if (isObject(sourceValue) && isObject(targetValue)) {
-          target[key] = deepMerge(
-            targetValue as Record<string, unknown>,
-            sourceValue as Record<string, unknown>
-          ) as T[Extract<keyof T, string>];
+          result[key] = deepMerge(
+            targetValue,
+            sourceValue
+          );
         } else {
-          target[key] = sourceValue as T[Extract<keyof T, string>];
+          result[key] = sourceValue;
         }
       }
     }
   }
 
-  return deepMerge(target, ...sources);
+  return deepMerge(result as T, ...sources);
 };
 
 /**

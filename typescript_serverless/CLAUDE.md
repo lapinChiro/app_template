@@ -35,6 +35,25 @@ Follow the RED-GREEN-BLUE cycle for all development:
 2. **GREEN**: Write minimal code to pass
 3. **BLUE**: Refactor while keeping tests green
 
+### Type-Driven Development
+
+Apply TDD principles to static type checking:
+
+1. **Incremental Type Checking**: Check only implemented packages
+2. **Early Error Detection**: Find type errors as you develop
+3. **Progressive Integration**: Add packages to type check as they're implemented
+
+```bash
+# Check only active packages (recommended during development)
+npm run typecheck
+
+# Update active packages list and check
+npm run typecheck:update
+
+# Check all packages (use when ready)
+npm run typecheck:all
+```
+
 ### Comprehensive Quality Assurance
 
 Every task must pass through:
