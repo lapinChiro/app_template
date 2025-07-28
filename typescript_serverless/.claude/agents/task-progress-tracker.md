@@ -41,10 +41,18 @@ Task and progress management agent supporting systematic development workflow. P
 - **Purpose**: Analyze current progress and select optimal next task
 - **When to use**: Step 1 of /dev execution
 - **Referenced files**:
-  - All `.md` files in `tasks/` directory (with YAML frontmatter)
-  - If not found, task files in `progress/backlog/`
-- **Process**: Read task files, analyze dependencies and critical path to select highest priority task
-- **Output**: Selected task ID (XX-YY format) and selection rationale
+  - `progress/SUMMARY.md` - Check completion status and "Next Recommended Tasks" section
+  - `progress/IN_PROGRESS.md` - Check for any interrupted tasks
+  - `progress/HANDOVER.md` - Review recent handover notes
+  - Selected task file from SUMMARY.md (e.g., `tasks/02-02-ui-component-library.md`)
+  - Dependency task completion records (e.g., `progress/completed/01-02.md`, `progress/completed/02-01.md`)
+- **Process**: 
+  1. Read SUMMARY.md to get the first recommended task
+  2. Check if any task is already in progress
+  3. Read the selected task file for requirements
+  4. Read completed records of tasks listed in `depends_on` field
+  5. Extract key decisions and implementations from dependencies
+- **Output**: Selected task ID, requirements, and dependency context
 
 #### `start XX-YY`
 
@@ -85,12 +93,13 @@ Task and progress management agent supporting systematic development workflow. P
 - **Referenced files**:
   - `progress/templates/summary.md` - SUMMARY.md template
   - All files in `progress/completed/` - Completed tasks
-  - All files in `progress/in-progress/` - In-progress tasks
-  - All files in `progress/backlog/` - Pending tasks
+  - `tasks/**/*.md` - All task files for dependency analysis
 - **Process**:
-  1. Aggregate YAML frontmatter from all task files
-  2. Calculate completion rate, velocity, and critical path
-  3. Regenerate `progress/SUMMARY.md` based on template
+  1. Count completed tasks from `progress/completed/`
+  2. Read all task files to analyze dependencies and calculate next recommendations
+  3. Calculate completion rate, velocity, and critical path
+  4. Regenerate `progress/SUMMARY.md` with pre-calculated "Next Recommended Tasks"
+- **Note**: This is the only command that reads all task files, to ensure accurate dependency analysis
 
 #### Other Commands
 
@@ -113,9 +122,21 @@ Each command returns output in the following format:
 **Rationale**: [Selection rationale]
 **Unblocks**: [Tasks that will be unblocked]
 **Estimated**: X hours
+**Depends on**: [XX-YY, XX-YY]
 
 ## 📋 Task Requirements
 [List of task requirements]
+
+## 🔗 Dependency Context
+### From 01-02 (TypeScript Configuration):
+- TypeScript 5.8.3 with strict mode
+- ESNext target, node module resolution
+- Composite project references enabled
+
+### From 02-01 (Shared Package):
+- Package name: @shared/core
+- Export structure: main + subpath exports (/utils, /types)
+- Build output: dist/ directory
 
 ## 🔄 Next Recommendation
 **Newly Available**: [Tasks that will become available]
@@ -170,23 +191,26 @@ Each command returns output in the following format:
 
 ## Algorithm and Implementation Details
 
-### Task Selection Algorithm
+### Task Selection Algorithm (Optimized)
 
-#### Task File Search Order
+#### Efficient Task Selection
 
-1. All `.md` files in `tasks/` directory
-2. If not found, files in `progress/backlog/`
-3. Read metadata in `task_frontmatter.yaml` format from each file's YAML frontmatter
+1. Read `progress/SUMMARY.md` - Already contains calculated "Next Recommended Tasks"
+2. Take the first task from recommended list
+3. Check `progress/IN_PROGRESS.md` for any active tasks
+4. Read only the selected task file (e.g., `tasks/02-02-ui-component-library.md`)
+5. Read completion records of dependency tasks listed in `depends_on` field
 
-#### Priority Calculation
+#### Why This Works
 
-1. Filter available tasks with satisfied dependencies
-2. Calculate priority score based on:
-   - Number of tasks to unblock (×10)
-   - On critical path (+50)
-   - Estimated hours (prefer smaller tasks)
-   - Category progress (prefer categories near completion)
-3. Return highest scoring task
+- SUMMARY.md is regenerated after each task completion
+- Next recommended tasks are pre-calculated based on:
+  - Dependency satisfaction
+  - Critical path analysis
+  - Task size and category progress
+- No need to read all 25 task files every time
+- Dependency context is obtained from completion records
+- Reduces file reads from ~30 to ~5-7 (depending on dependencies)
 
 ### Progress Management Directory Structure
 

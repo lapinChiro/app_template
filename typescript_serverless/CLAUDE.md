@@ -2,50 +2,57 @@
 
 This file provides guidance to Claude Code when working with this repository.
 
+This document defines strategic principles. See prompt.md for tactical implementation.
+
 ## Language Policy
 
 **Dialogue**: 日本語で回答
 **Code**: English only (comments, variables, documentation)
 
-- Reason: Unambiguous subject-object relationships in English
-
 ## Project Context
 
 TypeScript serverless monorepo: Next.js + AWS Lambda + CDK
 
-## Execution Decision Tree
+## Development Philosophy
 
-```
-START
-  │
-  ├─ Code changes? No → implement → qa
-  │
-  └─ Code changes? Yes → File count?
-      ├─ 1-2 files → test:red → implement → test:green → qa
-      ├─ 3-5 files → test:red → implement → test:green → test:blue → review → qa
-      └─ 6+ files → tracker:start → test:red → implement → test:green → qa:quick → 
-                     test:blue → qa:quick → architect → review → qa → tracker:complete
-```
+### UNIX Philosophy
 
-### Special Case Injection
+Write programs that do one thing and do it well. Write programs to work together. Choose portability over efficiency, clarity over cleverness.
 
-- Path contains [auth|login|password|token|crypto] → Insert `security` before `review`
-- File is [*.d.ts|interface|type] → Insert `typesafe` before `review`
-- Context mentions [performance|optimize|speed] → Insert `perf` before `qa`
+### Don't Reinvent the Wheel
+
+Leverage existing, proven solutions before implementing custom alternatives. Research available libraries, frameworks, and tools first.
+
+### Orthogonality Principle
+
+Design independent, loosely coupled components where changes to one component have minimal impact on others. Maintain clear separation of concerns and avoid unexpected interdependencies.
+
+### Test-Driven Development (t_wada's TDD)
+
+Follow the RED-GREEN-BLUE cycle for all development:
+
+1. **RED**: Write failing test first
+2. **GREEN**: Write minimal code to pass
+3. **BLUE**: Refactor while keeping tests green
+
+### Comprehensive Quality Assurance
+
+Every task must pass through:
+
+- Test verification
+- Code review
+- Security audit
+- Quality assurance
 
 ## Core Principles
 
 ### DRY (Don't Repeat Yourself)
 
-- Trigger: Code appears 3+ times
-- Action: Extract to shared function/component
-- Validation: Each piece of knowledge has single authoritative representation
+Each piece of knowledge must have a single, unambiguous, authoritative representation within the system.
 
 ### KISS (Keep It Simple, Stupid)
 
-- Trigger: Solution complexity exceeds problem complexity
-- Action: Simplify to minimal viable solution
-- Validation: Junior developer can understand in 5 minutes
+Choose the simplest solution that fully addresses the problem. Avoid over-engineering.
 
 ### SOLID Principles
 
@@ -55,27 +62,33 @@ START
 - **I**: Many specific interfaces over one general
 - **D**: Depend on abstractions, not concretions
 
-### TDD (Test-Driven Development)
-
-1. **RED**: Write failing test first
-2. **GREEN**: Write minimal code to pass
-3. **BLUE**: Refactor while keeping tests green
-
 ## Type Safety Enforcement
 
 ### Mandatory Levels (1-3)
 
 ```typescript
-// Level 1: tsconfig.json
-"strict": true,
-"noImplicitAny": true
+// Level 1: Compiler-level type checking (tsconfig.json)
+{
+  "strict": true,
+  "noImplicitAny": true,
+  "strictNullChecks": true
+}
 
-// Level 2: ESLint rules
-"@typescript-eslint/no-explicit-any": "error"
+// Level 2: Linter-level type enforcement (eslint.config.js)
+{
+  "@typescript-eslint/no-explicit-any": "error",
+  "@typescript-eslint/strict-boolean-expressions": "error"
+}
 
-// Level 3: Runtime validation
+// Level 3: Runtime validation with Zod
 import { z } from 'zod';
-const schema = z.object({ /* ... */ });
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  email: z.string().email(),
+  role: z.enum(['admin', 'user'])
+});
+type User = z.infer<typeof UserSchema>;
+const user = UserSchema.parse(data); // Throws if invalid
 ```
 
 ### Advanced Levels (4-8) - Apply when needed
@@ -86,103 +99,19 @@ const schema = z.object({ /* ... */ });
 - Level 7: Mapped types for transformations
 - Level 8: Type-level programming
 
-## SubAgent Usage
+## SubAgent Philosophy
 
-### Always Use (3)
+Utilize specialized agents to ensure quality and consistency:
 
-- `qa`: Final step of every task
-- `test`: All code changes (except config/style/docs)
-- `tracker`: Tasks with 6+ file changes
+- Automate repetitive quality checks
+- Enforce architectural principles
+- Maintain security standards
+- Ensure type safety
 
-### Conditional Use (4)
+## Parallel Execution Philosophy
 
-- `review`: 3+ file changes
-- `architect`: 6+ file changes
-- `security`: Auth/crypto/data access changes
-- `typesafe`: Type definition changes
+Maximize efficiency through parallel execution when tasks are independent. Sequential execution should only be used when there are explicit dependencies between operations.
 
-### On-Demand Use (5)
+## /dev Command
 
-- `perf`: Performance issues reported
-- `docker`: Container file changes
-- `monorepo`: Workspace dependency changes
-- `debug`: Unknown error causes
-- `guide`: Implementation uncertainty
-
-## Parallel Execution Rules
-
-```typescript
-// Sequential (default)
-await readFile1();
-await readFile2();
-
-// Parallel (when independent)
-await Promise.all([
-  readFile1(),
-  readFile2(),
-  readFile3()
-]);
-```
-
-## Error Priority
-
-1. **Stop immediately**: Build errors, TypeScript errors, Security vulnerabilities
-2. **Fix after task**: Lint warnings, Performance issues
-
-## Progress Tracking
-
-### Minimal YAML
-
-```yaml
----
-task_id: 'XX-YY'
-status: 'completed'
-files: 3
-quality: 'pass'
----
-```
-
-### Full YAML (6+ files)
-
-```yaml
----
-task_id: 'XX-YY'
-status: 'completed'
-files: 8
-quality: 'pass'
-blocks_tasks: ['XX-YY']
-depends_on: ['XX-YY']
-decisions:
-  pattern: 'Repository'
-  rationale: 'Data access abstraction'
----
-```
-
-## Quality Gates
-
-- **Any detection**: Fix immediately, no tolerance
-- **Build must pass**: Before any commit
-- **Tests must pass**: Before marking complete
-
-## Command Memory
-
-```bash
-# Quality check (memorized)
-npm run lint && npm run typecheck && npm run build
-
-# Test execution (memorized)
-npm test
-
-# Dev server (memorized)
-npm run dev
-```
-
-## /dev Execution Sequence
-
-When user types `/dev`:
-
-1. Check progress/SUMMARY.md and IN_PROGRESS.md
-2. Use tracker agent to analyze and select task
-3. Execute workflow based on Decision Tree
-4. Update progress with tracker agent
-5. Recommend next task
+The `/dev` command triggers automated development workflow following TDD principles and comprehensive quality checks.

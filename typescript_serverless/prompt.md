@@ -1,130 +1,154 @@
 # Development Execution Prompt
 
-Execute optimal task based on current project state and automated workflow selection.
+Execute optimal task based on current project state using standard workflow.
+
+This prompt defines specific implementation details following the principles in CLAUDE.md.
 
 ## Execution Sequence
-
-### Pre-Flight Check: File Existence Validation
-
-```bash
-# STOP IMMEDIATELY if expected files are missing, except:
-# - First task (01-01): progress files do not exist yet
-# - After first task: These files MUST exist
-
-if (current_task != "01-01" && !exists("progress/SUMMARY.md", "progress/IN_PROGRESS.md", "progress/HANDOVER.md")) {
-  STOP("❌ Missing required progress files. Run task 01-01 first.");
-}
-
-# Check other critical files
-if (!exists("@docs/impl/**", "@CLAUDE.md", "@tasks/**/*.md")) {
-  STOP("❌ Missing critical project files. Verify repository integrity.");
-}
-```
 
 ### Step 0: Project State Analysis (MANDATORY)
 
 ```bash
-# Parallel execution for state check
-Parallel: 
-  Read progress/HANDOVER.md,
-  Read progress/SUMMARY.md,
-  Read progress/IN_PROGRESS.md,
-  Use Task tool with subagent_type: "tracker", prompt: "analyze"
+# Use tracker agent for complete state analysis
+Use Task tool with subagent_type: "tracker", prompt: "analyze"
+# The tracker agent will read all necessary files and provide consolidated analysis
 ```
 
-### Step 1: Task Selection and Scope Detection
+### Step 1: Task Selection
 
 ```bash
-# Find and analyze current task
-Glob: "tasks/**/*.md"
-Read: [highest_priority_ready_task]
-
-# Determine scope automatically
-file_count = count_modified_files(task_description)
+# Tracker agent already selected the task in Step 0
+# Read the selected task file for detailed requirements
+Read: [selected_task_file]
 ```
 
-### Step 2: Automated Workflow Execution
+### Step 2: Workflow Agent Execution
 
-#### No Code Changes (config/style/docs only)
+#### Core Workflow Agents (Execute for ALL tasks)
 
-```bash
-implement → qa → tracker:complete
-```
+1. `tracker:start` - Mark task as started
+2. `test:red` - Write failing test
+3. `implement` - Write code to pass test
+4. `test:green` - Verify test passes
+5. `test:blue` - Refactor code
+6. `security` - Security audit (ALWAYS run for comprehensive quality)
+7. `review` - Code review for SOLID principles
+8. `qa` - Final quality check
+9. `tracker:complete` - Mark task complete with handover
 
-#### 1-2 Files
+#### Additional Specialized Agents (Add based on task context)
 
-```bash
-test:red → implement → test:green → qa → tracker:complete
-```
+```txt
+When modifying authentication/crypto files:
+  → Add additional security deep-scan after main security check
 
-#### 3-5 Files
+When modifying type definitions (*.d.ts):
+  → Add typesafe agent after review
 
-```bash
-test:red → implement → test:green → test:blue → review → qa → tracker:complete
-```
+When addressing performance issues:
+  → Add perf agent before qa
 
-#### 6+ Files
+When making architectural changes:
+  → Add architect agent after review
 
-```bash
-tracker:start → test:red → implement → test:green → qa:quick → 
-test:blue → qa:quick → architect → review → qa → tracker:complete
-```
-
-### Step 3: Special Case Agent Injection
-
-```typescript
-if (path.includes('auth', 'login', 'password', 'token', 'crypto')) {
-  inject('security', before: 'review');
-}
-
-if (file.endsWith('.d.ts') || content.includes('interface', 'type')) {
-  inject('typesafe', before: 'review');
-}
-
-if (description.includes('performance', 'optimize', 'speed')) {
-  inject('perf', before: 'qa');
-}
+When modifying Docker files:
+  → Add docker agent after implement
 ```
 
 ## Agent Command Reference
 
 ```bash
-# Test-Driven Development
-Use Task tool with subagent_type: "test", prompt: "red"    # Create failing test
-Use Task tool with subagent_type: "test", prompt: "green"  # Minimal implementation
-Use Task tool with subagent_type: "test", prompt: "blue"   # Refactor safely
+# Test-Driven Development (t_wada's TDD)
+Use Task tool with subagent_type: "test", prompt: "red [function/class name]"   # Write failing test
+Use Task tool with subagent_type: "test", prompt: "green"                       # Verify test passes
+Use Task tool with subagent_type: "test", prompt: "blue"                        # Refactor with tests
 
 # Quality Assurance
-Use Task tool with subagent_type: "qa", prompt: "quick"    # ESLint + TypeScript only
-Use Task tool with subagent_type: "qa"                     # Full quality check
+Use Task tool with subagent_type: "qa"                     # Full quality analysis
+Use Task tool with subagent_type: "qa", prompt: "quick"    # Quick check with auto-fix during TDD
+Use Task tool with subagent_type: "qa", prompt: "fix"      # Fix auto-fixable issues
+Use Task tool with subagent_type: "qa", prompt: "report"   # Generate detailed report
 
 # Task Management
-Use Task tool with subagent_type: "tracker", prompt: "start XX-YY"
-Use Task tool with subagent_type: "tracker", prompt: "complete XX-YY with handover: [generated files, environment changes, important commands, known issues]"    # Updates SUMMARY.md, IN_PROGRESS.md, and HANDOVER.md
+Use Task tool with subagent_type: "tracker", prompt: "analyze"        # Analyze and select task
+Use Task tool with subagent_type: "tracker", prompt: "start XX-YY"    # Mark task as started
+Use Task tool with subagent_type: "tracker", prompt: "complete XX-YY with handover: [
+  - Generated: report-XX-YY.md, logs/test-results.log
+  - Environment: New packages installed via npm
+  - Commands: npm test, npm run build  
+  - Issues: Any warnings or known issues
+  - Cleanup: Temporary files removed
+]"                                                                     # Complete with handover
+Use Task tool with subagent_type: "tracker", prompt: "summary"        # Update SUMMARY.md
 
-# Code Review and Architecture
-Use Task tool with subagent_type: "review"      # SOLID principles check
-Use Task tool with subagent_type: "architect"   # Clean Architecture validation
-Use Task tool with subagent_type: "security"    # Vulnerability scan
-Use Task tool with subagent_type: "typesafe"    # Type safety enforcement
+# Code Review
+Use Task tool with subagent_type: "review"                          # Review all changes
+Use Task tool with subagent_type: "review", prompt: "file1.ts file2.ts"  # Review specific files
+Use Task tool with subagent_type: "review", prompt: "--quick"       # Quick review
+Use Task tool with subagent_type: "review", prompt: "--focus=types,solid"  # Focused review
+
+# Architecture Enforcement
+Use Task tool with subagent_type: "architect"                       # Full architecture check
+Use Task tool with subagent_type: "architect", prompt: "check --layer=domain"  # Check specific layer
+Use Task tool with subagent_type: "architect", prompt: "solid"      # SOLID principles check
+Use Task tool with subagent_type: "architect", prompt: "deps"       # Dependency rules check
+
+# Security Audit
+Use Task tool with subagent_type: "security"                        # Security analysis
+Use Task tool with subagent_type: "security", prompt: "scan"        # Scan with fix suggestions
+Use Task tool with subagent_type: "security", prompt: "--scope=auth"  # Auth-focused scan
+Use Task tool with subagent_type: "security", prompt: "--scope=api"   # API security scan
+
+# Type Safety
+Use Task tool with subagent_type: "typesafe"                        # Full type safety check
+Use Task tool with subagent_type: "typesafe", prompt: "level-3"     # Check specific level
+Use Task tool with subagent_type: "typesafe", prompt: "fix"         # Fix type issues
+Use Task tool with subagent_type: "typesafe", prompt: "generate"    # Generate type-safe code
 ```
 
 ## Parallel Execution Patterns
 
-```bash
-# File operations
-Parallel: Read file1.ts, Read file2.ts, Read file3.ts
+### Sequential Execution (when dependencies exist)
 
-# Quality checks  
-Parallel: 
-  Bash "npm run lint",
-  Bash "npm run typecheck", 
-  Bash "npm test"
+```txt
+First message: Use Read tool with file_path: "config.ts"
+Second message: Use Read tool with file_path: "implementation.ts"  # Depends on config
+```
 
-# Multi-agent validation
-Parallel:
-  Use Task tool with subagent_type: "security",
-  Use Task tool with subagent_type: "review"
+### Parallel Execution (when tasks are independent)
+
+Single message containing multiple tool calls:
+
+```markdown
+- Use Read tool with file_path: "src/file1.ts"
+- Use Read tool with file_path: "src/file2.ts"
+- Use Read tool with file_path: "src/file3.ts"
+```
+
+### Common Parallel Patterns
+
+#### Quality Check Bundle
+
+```markdown
+- Use Bash tool with command: "npm run lint"
+- Use Bash tool with command: "npm run typecheck"
+- Use Bash tool with command: "npm test"
+```
+
+#### Multi-Agent Validation
+
+```markdown
+- Use Task tool with subagent_type: "security", prompt: "analyze current implementation"
+- Use Task tool with subagent_type: "review", prompt: "check SOLID principles"
+- Use Task tool with subagent_type: "typesafe", prompt: "level-3"
+```
+
+#### File Analysis Bundle
+
+```markdown
+- Use Read tool with file_path: "package.json"
+- Use Read tool with file_path: "tsconfig.json"
+- Use Read tool with file_path: "eslint.config.js"
 ```
 
 ## Error Handling Protocol
@@ -140,50 +164,40 @@ Parallel:
 
 1. Stop current workflow
 2. Fix error immediately
-3. Run `qa:quick` to verify fix
+3. Run `qa` to verify fix
 4. Resume from interruption point
 
-## Progress Documentation
+## Progress Tracking
 
-### Automatic Updates by tracker:complete
+### When to Use Tracker Agent
 
-The tracker agent automatically updates:
-- progress/SUMMARY.md - Task completion summary
-- progress/IN_PROGRESS.md - Clear current task
-- progress/HANDOVER.md - Record handover information:
-  - Generated artifacts (reports, logs)
-  - Environment state changes
-  - Known issues or warnings
-  - Special commands used
-  - Temporary files created/cleaned
+#### Task Start (MANDATORY - Beginning of workflow)
 
-### Simple Tasks (1-5 files)
-
-```yaml
----
-task_id: 'XX-YY'
-status: 'completed'
-files: 3
-quality: 'pass'
----
+```bash
+Use Task tool with subagent_type: "tracker", prompt: "start 02-03"
 ```
 
-### Complex Tasks (6+ files)
+#### Task Completion (MANDATORY - End of workflow)
 
-```yaml
----
-task_id: 'XX-YY' 
-status: 'completed'
-files: 8
-quality: 'pass'
-blocks_tasks: ['XX-ZZ', 'XX-AA']
-depends_on: ['XX-BB']
-decisions:
-  architecture: 'Repository Pattern'
-  rationale: 'Decoupled data access'
-  alternatives: 'Direct DB access (rejected - coupling)'
----
+```bash
+Use Task tool with subagent_type: "tracker", prompt: "complete 02-03 with handover: [
+  - Generated: zod-schemas.ts, validation-tests.spec.ts
+  - Environment: Installed zod@3.22.4
+  - Commands: npm test src/schemas, npm run build
+  - Issues: None
+  - Cleanup: Removed temporary test data files
+]"
 ```
+
+#### Summary Update (OPTIONAL - After task completion)
+
+```bash
+Use Task tool with subagent_type: "tracker", prompt: "summary"
+```
+
+### What Gets Tracked
+
+The tracker agent automatically manages task progress, including status transitions, time tracking, dependencies, quality metrics, technical decisions, and file changes.
 
 ## Quality Validation
 
@@ -193,25 +207,61 @@ decisions:
 - ✅ Build successful
 - ✅ Progress and handover documented (tracker:complete executed)
 
-## Fallback Commands (SubAgent unavailable)
+## Error Priority
+
+1. **Stop immediately**: Build errors, TypeScript errors, Security vulnerabilities
+2. **Fix after task**: Lint warnings, Performance issues
+
+## Quality Gates
+
+- **Any detection**: Fix immediately, no tolerance
+- **Build must pass**: Before any commit
+- **Tests must pass**: Before marking complete
+
+## Common Commands
 
 ```bash
-# Manual quality check
-npm run lint && npm run typecheck && npm run build && npm test
+# Quality check (run before any task completion)
+npm run lint && npm run typecheck && npm run build
 
-# Manual security scan
-npm audit && grep -r "password\|token\|secret" --include="*.ts" src/
+# Test execution (run after implementing features)
+npm test
 
-# Manual type check
-npx tsc --noEmit --strict
+# Dev server (for local development)
+npm run dev
 ```
 
-## Immediate Execution
+## SubAgent Failure Protocol
 
-Begin workflow now:
+If any SubAgent invocation fails:
 
-1. Execute Step 0 (parallel state analysis including progress/HANDOVER.md)
-2. Determine task scope automatically
-3. Follow Decision Tree workflow
-4. Execute tracker:complete with handover information
-5. Verify all Quality Validation checks are complete
+1. **STOP immediately** - Do not attempt manual workarounds
+2. **Report the failure** with:
+   - Which SubAgent failed (e.g., "test", "qa", "security")
+   - Exact invocation attempted (e.g., `Use Task tool with subagent_type: "test", prompt: "red"`)
+   - Error message received
+   - Current task context (task ID, step in workflow)
+3. **Wait for resolution** - User may need to check SubAgent configuration or Claude Code setup
+
+Example failure report:
+
+```markdown
+❌ SubAgent invocation failed
+- Agent: test
+- Command: Use Task tool with subagent_type: "test", prompt: "red"
+- Error: [error message]
+- Context: Task 02-02, TDD red phase
+- Action: Stopping workflow. Please check SubAgent configuration.
+```
+
+## /dev Command Execution
+
+When user types `/dev`, immediately execute:
+
+1. **Step 0**: Use tracker agent to analyze project state and select optimal task
+2. **Step 1**: Read selected task file for detailed requirements
+3. **Step 2**: Execute core workflow agents for ALL tasks (including security)
+4. **Step 2+**: Add specialized agents based on task context
+5. **Complete**: Use tracker:complete with comprehensive handover
+
+**Key principle**: One workflow for all tasks with comprehensive quality assurance. Security is not optional.
