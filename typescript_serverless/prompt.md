@@ -8,10 +8,10 @@ Execute optimal task based on current project state and automated workflow selec
 
 ```bash
 # STOP IMMEDIATELY if expected files are missing, except:
-# - First task (01-01): @progress files do not exist yet
+# - First task (01-01): progress files do not exist yet
 # - After first task: These files MUST exist
 
-if (current_task != "01-01" && !exists("@progress/SUMMARY.md", "@progress/IN_PROGRESS.md", "@progress/HANDOVER.md")) {
+if (current_task != "01-01" && !exists("progress/SUMMARY.md", "progress/IN_PROGRESS.md", "progress/HANDOVER.md")) {
   STOP("❌ Missing required progress files. Run task 01-01 first.");
 }
 
@@ -26,9 +26,9 @@ if (!exists("@docs/impl/**", "@CLAUDE.md", "@tasks/**/*.md")) {
 ```bash
 # Parallel execution for state check
 Parallel: 
-  Read @progress/HANDOVER.md,
-  Read @progress/SUMMARY.md,
-  Read @progress/IN_PROGRESS.md,
+  Read progress/HANDOVER.md,
+  Read progress/SUMMARY.md,
+  Read progress/IN_PROGRESS.md,
   Use Task tool with subagent_type: "tracker", prompt: "analyze"
 ```
 
@@ -148,9 +148,9 @@ Parallel:
 ### Automatic Updates by tracker:complete
 
 The tracker agent automatically updates:
-- @progress/SUMMARY.md - Task completion summary
-- @progress/IN_PROGRESS.md - Clear current task
-- @progress/HANDOVER.md - Record handover information:
+- progress/SUMMARY.md - Task completion summary
+- progress/IN_PROGRESS.md - Clear current task
+- progress/HANDOVER.md - Record handover information:
   - Generated artifacts (reports, logs)
   - Environment state changes
   - Known issues or warnings
@@ -210,7 +210,7 @@ npx tsc --noEmit --strict
 
 Begin workflow now:
 
-1. Execute Step 0 (parallel state analysis including @progress/HANDOVER.md)
+1. Execute Step 0 (parallel state analysis including progress/HANDOVER.md)
 2. Determine task scope automatically
 3. Follow Decision Tree workflow
 4. Execute tracker:complete with handover information

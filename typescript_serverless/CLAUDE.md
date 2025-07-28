@@ -181,7 +181,7 @@ npm run dev
 
 When user types `/dev`:
 
-1. Check @progress/SUMMARY.md and IN_PROGRESS.md
+1. Check progress/SUMMARY.md and IN_PROGRESS.md
 2. Use tracker agent to analyze and select task
 3. Execute workflow based on Decision Tree
 4. Update progress with tracker agent
