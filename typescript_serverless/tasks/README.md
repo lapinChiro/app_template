@@ -1,193 +1,88 @@
-# Implementation Tasks - Ultimate Type Safety Serverless Template
+# Development Tasks
+
+このディレクトリには、Ultimate Type Safety Serverless Template の開発タスクが整理されています。
 
 ## Overview
 
-This directory contains granular implementation tasks for building the Ultimate Type Safety Serverless Template. Each task is designed to be independent, well-documented, and implementable by any developer on the team.
+各タスクは明確な前提条件、完了条件、品質基準を持ち、`@docs/impl/` の実装ドキュメントを参照して一貫性のある開発を保証します。
 
-## Task Structure
-
-### Directory Organization
+## Directory Structure
 
 ```
 tasks/
-├── 01-type-safety-environment/    # Foundation: ESLint, Prettier, TypeScript
-├── 02-docker-environment/         # Development: Docker, Init Scripts, Workflow
-├── 03-shared-libraries/           # Core: Zod Schemas, Clean Architecture, Patterns
-├── 04-authentication/             # Auth: OAuth, JWT, Repository
-├── 05-ui-components/              # UI: shadcn/ui, Tailwind, Components
-├── 06-member-api/                 # API: Member endpoints and logic
-├── 07-admin-api/                  # API: Admin endpoints and management
-├── 08-member-frontend/            # Frontend: Member application
-├── 09-admin-frontend/             # Frontend: Admin application
-├── 10-infrastructure/             # AWS: CDK, Lambda, DynamoDB
-├── 11-testing/                    # QA: Test pyramid, E2E, Integration
-├── 12-documentation-cicd/         # Docs: OpenAPI, CI/CD, Documentation
-└── 13-completion/                 # Final: Polish, Templates, Deployment
+├── 01-foundation-setup/        # 基盤となる開発環境構築
+├── 02-core-infrastructure/     # 共有ライブラリとコア機能
+├── 03-authentication-system/   # 認証システム実装
+├── 04-frontend-applications/   # フロントエンドアプリケーション
+├── 05-api-implementation/      # API実装
+├── 06-testing-infrastructure/  # テスト環境構築
+├── 07-infrastructure-as-code/  # CDKインフラストラクチャ
+├── 08-cicd-automation/        # CI/CDと自動化
+├── README.md                  # このファイル
+└── TASK_INDEX.md             # 全タスクのインデックス
 ```
 
-### Task Naming Convention
+## Task Format
 
-- `XX-YY-task-name.md` where:
-  - `XX` = Section number (01-13)
-  - `YY` = Task number within section (01-04)
-  - `task-name` = Descriptive name
+各タスクファイルには以下の情報が含まれています：
 
-## Progress Tracking (CRITICAL)
-
-### Progress Directory
-
-**Every developer MUST record progress in `@progress/` directory**
-
-For each task you work on, create a progress file:
-
-```
-@progress/XX-YY-task-name.md
-```
-
-### Required Progress Information
-
-Each progress file must include:
-
-- Implementation steps completed
-- Issues encountered and solutions found
-- Time spent on the task
-- Files created/modified
-- Testing results and verification steps
-- Handoff notes for the next developer
-- Any deviations from the original plan
-
-### Progress Template
-
-```markdown
-# Progress: Task XX.YY - Task Name
-
-## Developer Info
-
-- **Developer**: [Your Name]
-- **Start Date**: [YYYY-MM-DD]
-- **Status**: [In Progress/Completed/Blocked]
-
-## Implementation Progress
-
-- [ ] Step 1 completed
-- [ ] Step 2 completed
-- [ ] Step 3 in progress
-
-## Time Tracking
-
-- **Estimated**: X hours
-- **Actual**: Y hours
-- **Efficiency**: [Notes on estimation accuracy]
-
-## Issues & Solutions
-
-### Issue 1: [Brief description]
-
-**Solution**: [How it was resolved]
-
-## Files Modified
-
-- `path/to/file1.ts` - [What was changed]
-- `path/to/file2.json` - [Configuration updates]
-
-## Testing Results
-
-- [ ] Unit tests pass
-- [ ] Integration tests pass
-- [ ] Manual testing completed
-
-## Handoff Notes
-
-[Important information for next developer or task dependencies]
-
-## Deviations
-
-[Any changes from original task specification]
-```
-
-## Task Dependencies
-
-### Critical Path (Cannot be parallelized)
-
-1. **01-01** → All other tasks (monorepo foundation)
-2. **01-02** → All development (type safety foundation)
-3. **03-01** → Most development tasks (schema foundation)
-
-### High-Impact Blockers
-
-- **02-02** (Docker) → Testing and development workflow
-- **04-01-04-03** (Auth system) → All API development
-- **05-01-05-03** (UI foundation) → All frontend development
-
-### Parallel Work Opportunities
-
-- Type safety tasks (01-02, 01-03) can be done in parallel
-- API development (06-_, 07-_) can be done in parallel after auth
-- Frontend development (08-_, 09-_) can be done in parallel after UI foundation
-
-## Implementation Strategy
-
-### TDD-First Approach
-
-All tasks should follow the RED → GREEN → BLUE cycle:
-
-- **RED**: Write failing tests first
-- **GREEN**: Implement minimal code to pass tests
-- **BLUE**: Refactor for quality and performance
-
-### Quality Standards
-
-- **Type Safety**: Zero ESLint errors/warnings, zero TypeScript errors
-- **Test Coverage**: 90%+ for all packages
-- **Architecture**: 100% Clean Architecture compliance
-- **Member/Admin Symmetry**: Consistent patterns across both APIs
-
-### Time Estimation Guidelines
-
-- **Junior Developer**: Use estimated time × 1.5
-- **Senior Developer**: Use estimated time as-is
-- **Expert Developer**: Use estimated time × 0.8
+1. **Prerequisites** - 必要な環境・ツール・知識
+2. **Reference Implementation** - `@docs/impl/` への参照
+3. **Acceptance Criteria** - 明確で測定可能な完了条件
+4. **Detailed Implementation** - 実装の詳細とコード例
+5. **Quality Gates** - 品質基準と数値目標
+6. **Verification Steps** - 検証手順とコマンド
+7. **Progress** - タスクの進捗状況
 
 ## Getting Started
 
-### 1. Choose Your Task
+1. **Phase 1: Foundation Setup** から開始
+   - 01-01: Project Structure Setup
+   - 01-02: TypeScript Configuration
+   - 01-03: ESLint Ultimate Type Safety
+   - 01-04: Docker Development Environment
 
-- Check dependencies in task file
-- Ensure prerequisite tasks are completed
-- Consider your skill level and available time
+2. 各タスクの **Dependencies** を確認し、依存タスクが完了していることを確認
 
-### 2. Create Progress File
+3. **Reference Implementation** のドキュメントを読み、実装方針を理解
 
-```bash
-cp tasks/progress-template.md progress/XX-YY-task-name.md
-```
+4. **Acceptance Criteria** に従って実装を進める
 
-### 3. Follow Task Instructions
+5. **Verification Steps** で動作確認を行う
 
-- Read implementation reference documents
-- Follow step-by-step implementation guide
-- Record progress continuously
+## Quality Standards
 
-### 4. Verify Completion
+全タスクは以下の品質基準を満たす必要があります：
 
-- Check all acceptance criteria
-- Run quality checks (lint, test, build)
-- Update progress file with final status
+- **Type Safety**: any 型使用箇所 0
+- **Code Quality**: ESLint/TypeScript エラー 0
+- **Test Coverage**: 90% 以上
+- **Documentation**: 完全な TSDoc コメント
 
-## Help and Support
+## Task Dependencies
 
-### Reference Documentation
+タスク間の依存関係は各タスクファイルの **Dependencies** セクションに記載されています。
+並列実行可能なタスクは同時に進めることができます。
 
-- Implementation guides in `@docs/impl/`
-- Architecture decisions in `@docs/design.md`
-- Project requirements in `@docs/requirements.md`
+## Progress Tracking
 
-### Common Issues
+各タスクの **Progress** セクションでチェックリストを使用して進捗を管理：
 
-- Check progress files from previous tasks
-- Review implementation reference documents
-- Ensure all dependencies are properly completed
+- [ ] Started - タスク開始
+- [ ] Implementation complete - 実装完了
+- [ ] Verified - 動作確認完了
+- [ ] Documented - ドキュメント作成完了
 
----
+## Support
 
-**Remember**: The goal is not just to complete tasks, but to build a maintainable, type-safe, and well-documented system that serves as a template for future projects.
+実装で困った場合は：
+
+1. `@docs/impl/` の実装ドキュメントを参照
+2. `@.claude/agents/` のサブエージェントを活用
+3. `@design.md` で全体の設計思想を確認
+
+## Next Steps
+
+1. [TASK_INDEX.md](./TASK_INDEX.md) で全タスクの一覧を確認
+2. Phase 1 のタスクから順番に実装を開始
+3. 各フェーズ完了時に品質チェックを実施

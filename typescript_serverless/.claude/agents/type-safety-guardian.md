@@ -102,9 +102,9 @@ const handler = async event => {
   // What's the shape of event?
 };
 
-// ✅ Explicit function signatures
-function calculate(a: number, b: number): number {
-  return a + b;
+// ✅ Explicit parameter types (return type inference is OK for internal functions)
+function calculate(a: number, b: number) {
+  return a + b; // TypeScript infers: number
 }
 
 const handler = async (event: APIGatewayEvent): Promise<APIGatewayProxyResult> => {

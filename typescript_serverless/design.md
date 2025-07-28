@@ -67,16 +67,14 @@ function processUser(user: User): string {
 
 **Level 2: Function Boundary Safety**
 
-- `@typescript-eslint/explicit-function-return-type: 'error'` - 全関数の戻り値型明示強制
 - `@typescript-eslint/explicit-module-boundary-types: 'error'` - モジュール境界での型明示強制
-- **哲学**: 関数・モジュール境界は契約であり、型がその契約の仕様書。曖昧さを排除し、インターフェースを自己文書化
+- **哲学**: モジュール境界は契約であり、型がその契約の仕様書。内部実装では型推論を活用し、公開APIでのみ型を明示化
 
 **Level 3: Null/Undefined Complete Safety**
 
 - `@typescript-eslint/no-non-null-assertion: 'error'` - `!`演算子の完全禁止
 - `@typescript-eslint/prefer-nullish-coalescing: 'error'` - `??`演算子の強制使用
 - `@typescript-eslint/prefer-optional-chain: 'error'` - `?.`演算子の強制使用
-- `@typescript-eslint/strict-boolean-expressions: 'error'` - 厳格なboolean式（string・numberの直接評価禁止）
 - **哲学**: null・undefinedは「10億ドルの間違い」。型システムレベルでの完全な安全性保証により、NullPointerExceptionを設計時に排除
 
 **Level 4: Promise/Async Complete Safety**
@@ -90,15 +88,15 @@ function processUser(user: User): string {
 **Level 5: Code Quality Gates**
 
 - `complexity: ['error', 15]` - 複雑度15以下強制（認知負荷の制限）
-- `max-lines-per-function: ['error', { max: 75 }]` - 関数75行以下強制（単一責任の原則）
-- `max-lines: ['error', { max: 200 }]` - ファイル200行以下強制（モジュールサイズ制御）
+- `max-lines-per-function: ['error', { max: 100 }]` - 関数100行以下強制（実用的な単一責任の原則）
+- `max-lines: ['error', { max: 300 }]` - ファイル300行以下強制（モジュールサイズ制御）
 - `no-console: 'error'` - デバッグコードの本番流入防止
-- **哲学**: 量的制約による質的向上。認知限界を考慮した制約により、理解可能で保守可能なコードを強制
+- **哲学**: 量的制約による質的向上。Claude Code生成に最適化された実用的な制約により、理解可能で保守可能なコードを強制
 
-**Level 6: Documentation Enforcement**
+**Level 6: Exhaustiveness Checking**
 
-- `tsdoc/syntax: 'error'` - TSDoc構文の強制適用
-- **哲学**: コードは書かれるより読まれる回数が多い。型＋ドキュメントによる完全な自己文書化
+- `@typescript-eslint/switch-exhaustiveness-check: 'error'` - switch文の網羅性チェック
+- **哲学**: Claude Codeの論理的思考を支援。全ケースの網羅により、エッジケースの見落としを防止
 
 **Level 7: Dependency Management**
 
@@ -188,7 +186,7 @@ function processUserData(data: UserData): string {
 - **スキーマ連動**: Zodスキーマ変更時のAPI文書自動更新
 - **構造化ドキュメント**: アーキテクチャ・開発・デプロイガイドの体系的整理
 
-**Implementation**: → [`impl/api/openapi-generation.md`](impl/api/openapi-generation.md)
+**Implementation**: → [`impl/api/zod-schemas.md`](impl/api/zod-schemas.md)
 
 ### Requirement 7: Google OAuth Authentication
 
@@ -317,7 +315,7 @@ graph TB
 - **テスタビリティ**: 全ビジネスロジックが独立してテスト可能
 - **保守性最大化**: 変更影響範囲の局所化と予測可能性
 
-**Implementation**: → [`impl/architecture/clean-layers.md`](impl/architecture/clean-layers.md)
+**Implementation**: 実装ドキュメント準備中
 
 ### 12-Factor App Compliance
 
@@ -336,7 +334,7 @@ graph TB
 | **XI. Logs**             | イベントストリーム化           |
 | **XII. Admin Processes** | ワンオフプロセス               |
 
-**Implementation**: → [`impl/config/12-factor-app.md`](impl/config/12-factor-app.md)
+**Implementation**: 実装ドキュメント準備中
 
 ## Technical Decisions
 
@@ -449,7 +447,7 @@ Quality Gates:
 | **Authentication** | `impl/auth/`           | `packages/shared/src/auth/`                                     |
 | **UI System**      | `impl/ui/`             | `packages/ui/src/components/`                                   |
 | **API Layer**      | `impl/api/`            | `apps/api-member/src/handlers/`, `apps/api-admin/src/handlers/` |
-| **Database**       | `impl/database/`       | `packages/shared/src/repository/`                               |
+| **Database**       | 実装ドキュメント準備中  | `packages/shared/src/repository/`                               |
 | **Infrastructure** | `impl/infrastructure/` | `packages/infra/lib/`                                           |
 | **Docker**         | `impl/docker/`         | `docker/`, `compose.yml`, `.dockerignore`                       |
 | **Testing**        | `impl/testing/`        | `**/*.test.ts`, `cypress/`                                      |

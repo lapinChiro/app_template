@@ -66,15 +66,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-argument': 'error',
 
     // 関数の厳格化
-    '@typescript-eslint/explicit-function-return-type': [
-      'error',
-      {
-        allowExpressions: true,
-        allowTypedFunctionExpressions: true,
-        allowHigherOrderFunctions: true,
-        allowDirectConstAssertionInArrowFunctions: true,
-      },
-    ],
+    // '@typescript-eslint/explicit-function-return-type'は削除済み - TypeScriptの型推論を活用
     '@typescript-eslint/explicit-module-boundary-types': 'error',
 
     // 未使用変数の厳格化
@@ -185,7 +177,7 @@ module.exports = {
       // テストファイルの共通設定
       files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
       rules: {
-        '@typescript-eslint/explicit-function-return-type': 'off',
+        // テストファイルでは型推論を活用
         '@typescript-eslint/explicit-module-boundary-types': 'off',
         'no-console': 'off',
         'max-lines-per-function': 'off',

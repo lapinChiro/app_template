@@ -491,6 +491,18 @@ async function setupInfrastructure(config: ProjectConfig): Promise<void> {
     spinner.text = 'Bootstrapping CDK...';
     execSync('npx cdk bootstrap', { stdio: 'pipe' });
 
+    // Verify Node.js 22 support for Lambda
+    spinner.text = 'Verifying Lambda runtime support...';
+    try {
+      // Note: AWS Lambda Node.js 22 runtime support
+      // As of project initialization, we use the latest available Node.js runtime
+      // Current runtime: NODEJS_22_X (verify availability in your AWS region)
+      execSync('aws lambda list-layers --query "Layers[?contains(LayerName, \'nodejs22\')]" --output json', { stdio: 'pipe' });
+    } catch (error) {
+      console.log(chalk.yellow('\n⚠️  Note: Ensure Node.js 22 runtime is available in your AWS region.'));
+      console.log(chalk.yellow('   If not available, update CDK stack to use NODEJS_20_X instead.\n'));
+    }
+
     // Deploy infrastructure
     spinner.text = 'Deploying infrastructure...';
     const deployCmd = `npx cdk deploy --require-approval never --context environment=${config.deployment.environment}`;
@@ -603,6 +615,7 @@ This application follows Clean Architecture principles with ultimate type safety
 
 - **Frontend**: Next.js with shadcn/ui + Tailwind CSS
 - **Backend**: Next.js API routes with TypeScript
+- **Lambda Runtime**: Node.js 22.x (or latest available in your region)
 - **Database**: DynamoDB with single table design
 - **Authentication**: Google OAuth + JWT
 - **Infrastructure**: AWS CDK for IaC

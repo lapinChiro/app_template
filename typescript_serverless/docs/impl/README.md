@@ -48,6 +48,8 @@ impl/
 ├── infrastructure/              # Infrastructure implementation examples
 │   ├── cdk-stacks.md           # CDK stack implementations
 │   └── deployment-pipeline.md  # CI/CD pipeline implementations
+├── security/                    # Security implementation examples
+│   └── best-practices.md       # Comprehensive security best practices
 └── workflow/                    # Development workflow examples
     ├── project-init.md         # Project initialization strategy
     ├── github-flow.md          # GitHub Flow implementation

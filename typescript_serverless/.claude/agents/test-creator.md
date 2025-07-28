@@ -298,7 +298,32 @@ describe('UserService', () => {
 });
 ```
 
-### 4. Async Testing
+### 4. Global Test Variables (TypeScript)
+
+```typescript
+// jest.setup.ts - Proper global variable declaration
+declare global {
+  var testUser: User;
+  var testAdminUser: User;
+}
+
+// Initialize global test data
+global.testUser = {
+  id: 'test-user-id',
+  name: 'Test User',
+  email: 'test@example.com',
+  role: 'member',
+};
+
+global.testAdminUser = {
+  id: 'test-admin-id', 
+  name: 'Test Admin',
+  email: 'admin@example.com',
+  role: 'admin',
+};
+```
+
+### 5. Async Testing
 
 ```typescript
 // ✅ Proper async/await usage

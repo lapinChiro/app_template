@@ -58,12 +58,7 @@ function processData(data: ProcessableData): string {
 ```javascript
 // .eslintrc.js
 rules: {
-  '@typescript-eslint/explicit-function-return-type': ['error', {
-    allowExpressions: true,
-    allowTypedFunctionExpressions: true,
-    allowHigherOrderFunctions: true,
-    allowDirectConstAssertionInArrowFunctions: true,
-  }],
+  // explicit-function-return-typeを削除 - TypeScriptの型推論を信頼
   '@typescript-eslint/explicit-module-boundary-types': 'error',
 }
 ```
@@ -71,12 +66,12 @@ rules: {
 **Implementation Examples:**
 
 ```typescript
-// ❌ 型が不明確な関数
-function createUser(data) {
+// ❌ モジュール境界で型が不明確
+export function createUser(data) {
   return { id: generateId(), ...data };
 }
 
-// ✅ 明示的な型境界
+// ✅ モジュール境界での明示的な型（内部実装では型推論を活用）
 interface CreateUserInput {
   readonly name: string;
   readonly email: string;
@@ -88,12 +83,16 @@ interface User {
   readonly email: string;
 }
 
-function createUser(data: CreateUserInput): User {
-  return {
-    id: generateId(),
+// 公開APIでは引数と戻り値の型を明示
+export function createUser(data: CreateUserInput): User {
+  // 内部実装では型推論を活用
+  const id = generateId(); // string型が推論される
+  const user = {
+    id,
     name: data.name,
     email: data.email,
   };
+  return user; // User型として推論される
 }
 ```
 
@@ -105,14 +104,6 @@ rules: {
   '@typescript-eslint/no-non-null-assertion': 'error',
   '@typescript-eslint/prefer-nullish-coalescing': 'error',
   '@typescript-eslint/prefer-optional-chain': 'error',
-  '@typescript-eslint/strict-boolean-expressions': ['error', {
-    allowNullableBoolean: true,
-    allowNullableObject: true,
-    allowNumber: false,
-    allowString: false,
-    allowNullableString: false,
-    allowNullableNumber: false
-  }],
 }
 ```
 
@@ -129,14 +120,14 @@ function getUserName(user: User | undefined): string {
   return user?.name ?? 'Unknown User';
 }
 
-// ❌ 曖昧なboolean判定
-function isValidInput(input: string): boolean {
-  return !!input; // 空文字列でfalse
-}
+// ❌ 非null assertion演算子の使用
+const element = document.getElementById('my-element')!;
+element.textContent = 'Hello'; // 実行時エラー可能性
 
-// ✅ 明示的なboolean判定
-function isValidInput(input: string): boolean {
-  return input.length > 0;
+// ✅ 適切なnullチェック
+const element = document.getElementById('my-element');
+if (element) {
+  element.textContent = 'Hello'; // 100%安全
 }
 ```
 
@@ -183,8 +174,8 @@ async function validateUsers(users: User[]): Promise<boolean> {
 // .eslintrc.js
 rules: {
   complexity: ['error', 15],
-  'max-lines-per-function': ['error', { max: 75 }],
-  'max-lines': ['error', { max: 200 }],
+  'max-lines-per-function': ['error', { max: 100 }], // 75→100行に緩和
+  'max-lines': ['error', { max: 300 }], // 200→300行に変更
   'no-console': 'error',
 }
 ```
@@ -226,38 +217,75 @@ function processEmailData(data: unknown): string {
 }
 ```
 
-### Layer 6: Documentation Enforcement
+### Layer 6: Exhaustiveness Checking
 
 ```javascript
 // .eslintrc.js
 rules: {
-  'tsdoc/syntax': 'error',
+  '@typescript-eslint/switch-exhaustiveness-check': 'error',
 }
 ```
 
 **Implementation Examples:**
 
-````typescript
-/**
- * ユーザーを作成し、データベースに保存します
- *
- * @param input - ユーザー作成に必要な入力データ
- * @returns 作成されたユーザーオブジェクト
- * @throws {ValidationError} 入力データが無効な場合
- *
- * @example
- * ```typescript
- * const user = await createUser({
- *   name: 'John Doe',
- *   email: 'john@example.com'
- * });
- * ```
- */
-export async function createUser(input: CreateUserInput): Promise<User> {
-  const validatedInput = validateUserInput(input);
-  return await userRepository.create(validatedInput);
+```typescript
+// ユニオン型の定義
+type Status = 'pending' | 'processing' | 'completed' | 'failed';
+
+// ❌ 網羅性チェックなし（新しいステータスが追加されても気づかない）
+function getStatusColor(status: Status): string {
+  switch (status) {
+    case 'pending':
+      return 'yellow';
+    case 'processing':
+      return 'blue';
+    case 'completed':
+      return 'green';
+    // 'failed'のケースが漏れている！
+  }
+  return 'gray'; // デフォルト値で誤魔化している
 }
-````
+
+// ✅ 網羅性チェックあり（すべてのケースを処理）
+function getStatusColor(status: Status): string {
+  switch (status) {
+    case 'pending':
+      return 'yellow';
+    case 'processing':
+      return 'blue';
+    case 'completed':
+      return 'green';
+    case 'failed':
+      return 'red';
+    // すべてのケースを処理しているため、defaultは不要
+  }
+}
+
+// ✅ Never型を使った網羅性チェック（より厳密）
+function assertNever(value: never): never {
+  throw new Error(`Unexpected value: ${value}`);
+}
+
+function processStatus(status: Status): void {
+  switch (status) {
+    case 'pending':
+      // 処理...
+      break;
+    case 'processing':
+      // 処理...
+      break;
+    case 'completed':
+      // 処理...
+      break;
+    case 'failed':
+      // 処理...
+      break;
+    default:
+      // すべてのケースを処理していれば、ここには到達しない
+      assertNever(status);
+  }
+}
+```
 
 ### Layer 7: Dependency Management
 

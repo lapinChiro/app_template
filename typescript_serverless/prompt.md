@@ -1,210 +1,186 @@
-# 🚀 Development Execution Prompt - Ultimate Type Safety Template
+# Development Execution Prompt
 
-## Mission
+Execute optimal task based on current project state and automated workflow selection.
 
-Analyze progress and execute the next optimal development task with complete implementation using a comprehensive 12-agent system for ultimate type safety and quality.
+## Execution Sequence
 
-**Note**: This prompt is executed by the `/dev` command after requirement.md, design.md, and tasks/ have been created.
+### Step 0: Project State Analysis (MANDATORY)
 
-## EXECUTION SEQUENCE (MANDATORY)
-
-### Step 0: Overall Progress Check (NEW - MANDATORY)
-
-```txt
-# Check overall progress summary
-Read @progress/SUMMARY.md
-
-# Check for any interrupted work
-Read @progress/IN_PROGRESS.md
+```bash
+# Parallel execution for state check
+Parallel: 
+  Read @progress/SUMMARY.md,
+  Read @progress/IN_PROGRESS.md,
+  Use Task tool with subagent_type: "tracker", prompt: "analyze"
 ```
 
-_Understand current project state and any incomplete work before proceeding_
+### Step 1: Task Selection and Scope Detection
 
-### Step 1: Progress Analysis and Task Selection
+```bash
+# Find and analyze current task
+Glob: "tasks/**/*.md"
+Read: [highest_priority_ready_task]
 
-```txt
-Use Task tool with subagent_type: "tracker"
-Prompt: "analyze"  # Returns current status and optimal next task
+# Determine scope automatically
+file_count = count_modified_files(task_description)
 ```
 
-_Get current status and task recommendations - tracker will return the selected task ID_
+### Step 2: Automated Workflow Execution
 
-### Step 2: Implementation Guidance (if needed)
+#### No Code Changes (config/style/docs only)
 
-```txt
-Use Task tool with subagent_type: "guide"
-Prompt: "[specific implementation question]"
+```bash
+implement → qa
 ```
 
-### Step 3: Test-Driven Development with Quality Gates
+#### 1-2 Files
 
-```txt
-Use Task tool with subagent_type: "test"
-Prompt: "red" # Create failing tests
-
-Use Task tool with subagent_type: "test"
-Prompt: "green" # Implement minimal code
-
-# CRITICAL: Quality check after implementation
-Use Task tool with subagent_type: "qa"
-Prompt: "quick" # Run eslint & tsc to fix errors immediately
-
-Use Task tool with subagent_type: "test"
-Prompt: "blue" # Refactor with safety
-
-# Final quality check after refactoring
-Use Task tool with subagent_type: "qa"
-Prompt: "quick" # Ensure refactoring didn't introduce errors
+```bash
+test:red → implement → test:green → qa
 ```
 
-_Follow TDD cycle with quality gates for all implementations_
+#### 3-5 Files
 
-### Step 4: Implementation with Quality Checks
-
-- Follow selected task requirements
-- Use specialized agents during implementation:
-  - `architect` - Clean Architecture compliance
-  - `typesafe` - Ultimate Type Safety (8-level)
-  - `monorepo` - Workspace dependencies
-- Update progress file YAML frontmatter continuously
-
-### Step 5: Comprehensive Quality Verification
-
-```txt
-Use Task tool with subagent_type: "security"  # Security vulnerability check
-Use Task tool with subagent_type: "review"    # Code quality and SOLID principles
-Use Task tool with subagent_type: "qa"        # Final quality gate
+```bash
+test:red → implement → test:green → test:blue → review → qa
 ```
 
-_Ensure zero defects before completion_
+#### 6+ Files
 
-### Step 6: Task Completion and Progress Update
-
-```txt
-# Mark task as completed and update progress
-Use Task tool with subagent_type: "tracker"
-Prompt: "complete XX-YY"  # Replace XX-YY with actual task ID
-
-# Update overall project summary
-Use Task tool with subagent_type: "tracker"
-Prompt: "summary"
+```bash
+tracker:start → test:red → implement → test:green → qa:quick → 
+test:blue → qa:quick → architect → review → qa → tracker:complete
 ```
 
-## SubAgent Usage Matrix (12 Agents Total)
+### Step 3: Special Case Agent Injection
 
-**MANDATORY AGENTS** (Must use):
+```typescript
+if (path.includes('auth', 'login', 'password', 'token', 'crypto')) {
+  inject('security', before: 'review');
+}
 
-- `tracker` - FIRST step (progress analysis) & LAST step (update progress)
-- `test` - TDD cycle for all new code
-- `qa` - Final quality gate before completion
+if (file.endsWith('.d.ts') || content.includes('interface', 'type')) {
+  inject('typesafe', before: 'review');
+}
 
-**QUALITY AGENTS** (Use for thorough checks):
+if (description.includes('performance', 'optimize', 'speed')) {
+  inject('perf', before: 'qa');
+}
+```
 
-- `architect` - Clean Architecture compliance validation
-- `typesafe` - Ultimate Type Safety enforcement (8-level system)
-- `security` - OWASP Top 10 and vulnerability detection
-- `review` - SOLID principles and code quality
+## Agent Command Reference
 
-**SPECIALIZED AGENTS** (Use when applicable):
+```bash
+# Test-Driven Development
+Use Task tool with subagent_type: "test", prompt: "red"    # Create failing test
+Use Task tool with subagent_type: "test", prompt: "green"  # Minimal implementation
+Use Task tool with subagent_type: "test", prompt: "blue"   # Refactor safely
 
-- `guide` - Implementation guidance from @docs/impl/ directory
-- `monorepo` - Workspace dependency management
-- `perf` - Performance optimization (Core Web Vitals)
-- `docker` - Container environment optimization
-- `debug` - Systematic debugging support
+# Quality Assurance
+Use Task tool with subagent_type: "qa", prompt: "quick"    # ESLint + TypeScript only
+Use Task tool with subagent_type: "qa"                     # Full quality check
 
-**Note**: Invoke these agents using the Task tool with the appropriate `subagent_type`, not as slash commands.
+# Task Management
+Use Task tool with subagent_type: "tracker", prompt: "start XX-YY"
+Use Task tool with subagent_type: "tracker", prompt: "complete XX-YY"
 
-## Success Criteria
+# Code Review and Architecture
+Use Task tool with subagent_type: "review"      # SOLID principles check
+Use Task tool with subagent_type: "architect"   # Clean Architecture validation
+Use Task tool with subagent_type: "security"    # Vulnerability scan
+Use Task tool with subagent_type: "typesafe"    # Type safety enforcement
+```
 
-- ✅ All acceptance criteria met
-- ✅ Zero ESLint errors (checked after each TDD phase)
-- ✅ Zero TypeScript errors (checked after each TDD phase)
-- ✅ Build success
-- ✅ Progress file updated with YAML frontmatter
-- ✅ Technical decisions documented
+## Parallel Execution Patterns
 
-**CRITICAL**: ESLint and TypeScript errors must be resolved immediately after each implementation phase (GREEN) and refactoring phase (BLUE) using `qa quick` to prevent error accumulation.
+```bash
+# File operations
+Parallel: Read file1.ts, Read file2.ts, Read file3.ts
 
-## Required YAML Frontmatter (CRITICAL for tracking)
+# Quality checks  
+Parallel: 
+  Bash "npm run lint",
+  Bash "npm run typecheck", 
+  Bash "npm test"
+
+# Multi-agent validation
+Parallel:
+  Use Task tool with subagent_type: "security",
+  Use Task tool with subagent_type: "review"
+```
+
+## Error Handling Protocol
+
+### Immediate Stop Conditions
+
+- TypeScript compilation errors
+- ESLint errors (not warnings)
+- Build failures
+- Security vulnerabilities
+
+### Resolution Sequence
+
+1. Stop current workflow
+2. Fix error immediately
+3. Run `qa:quick` to verify fix
+4. Resume from interruption point
+
+## Progress Documentation
+
+### Simple Tasks (1-5 files)
 
 ```yaml
 ---
 task_id: 'XX-YY'
-task_name: 'descriptive-name'
-task_status: 'completed'
-developer: 'developer-name'
-start_date: 'YYYY-MM-DD'
-end_date: 'YYYY-MM-DD'
-estimated_hours: X
-actual_hours: X.X
-blocks_tasks: ['XX-YY', 'XX-YY'] # tasks waiting for this completion
-depends_on_completed: ['XX-YY'] # prerequisite tasks
-technical_decisions:
-  key_choice: 'chosen-option'
-  pattern: 'implementation-approach'
-files_modified:
-  - path: 'path/to/file'
-    action: 'created|modified|deleted'
-    purpose: 'what this file does'
-quality_metrics:
-  eslint_errors: 0
-  typescript_errors: 0
-  build_success: true
-acceptance_criteria_met: 'X/Y'
+status: 'completed'
+files: 3
+quality: 'pass'
 ---
 ```
 
-## Expected Output Format
+### Complex Tasks (6+ files)
 
-```md
-## 📊 Progress Analysis
-- Completed: [X] tasks, Ready: [Y] tasks, Blocked: [Z] tasks
-
-## 🎯 Selected Task: XX-YY [Task Name]
-**Rationale**: [Why chosen] **Unblocks**: [List] **Estimated**: [X hours]
-
-## 🚀 Implementation
-[Complete implementation with code, configs, etc.]
-
-## ✅ Verification Results
-- ESLint: [✅/❌], TypeScript: [✅/❌], Acceptance Criteria: [X/Y] met
-
-## 🔄 Next Recommendation
-**Newly Available**: [Tasks unblocked] **Suggested Next**: [Optimal follow-up]
+```yaml
+---
+task_id: 'XX-YY' 
+status: 'completed'
+files: 8
+quality: 'pass'
+blocks_tasks: ['XX-ZZ', 'XX-AA']
+depends_on: ['XX-BB']
+decisions:
+  architecture: 'Repository Pattern'
+  rationale: 'Decoupled data access'
+  alternatives: 'Direct DB access (rejected - coupling)'
+---
 ```
 
-## Fallback Strategy (if SubAgents unavailable)
+## Quality Validation
 
-- **Progress Analysis**: Read @progress/ directory YAML frontmatter manually
-- **Task Selection**: Read @tasks/ directory and use critical path (most blocks_tasks) + dependency satisfaction
-- **TDD Implementation**: Create tests manually following RED-GREEN-BLUE cycle
-- **Architecture Check**: Verify Clean Architecture layers and SOLID principles manually
-- **Type Safety**: Run `npx tsc --noEmit` and check for any type errors
-- **Security Check**: Run `npm audit` and review authentication/data handling code
-- **Code Review**: Check complexity, naming conventions, and design patterns
-- **Quality Verification**: `npm run lint && npx tsc --noEmit && npm test && npm run build`
+- ✅ Zero TypeScript errors
+- ✅ Zero ESLint errors  
+- ✅ All tests passing
+- ✅ Build successful
+- ✅ Progress documented
 
----
+## Fallback Commands (SubAgent unavailable)
 
-## 🎯 IMMEDIATE ACTION
+```bash
+# Manual quality check
+npm run lint && npm run typecheck && npm run build && npm test
 
-**Claude Code**: Execute this development cycle:
+# Manual security scan
+npm audit && grep -r "password\|token\|secret" --include="*.ts" src/
 
-### Task Start (Steps 0-2)
-0. Read @progress/SUMMARY.md and @progress/IN_PROGRESS.md - Check project state
-1. Use Task tool with `tracker` prompt: "analyze" - Get task selection and recommendations
-2. Use Task tool with `tracker` prompt: "start XX-YY" - Mark selected task as started
+# Manual type check
+npx tsc --noEmit --strict
+```
 
-### Task Implementation (Steps 3-5)
-3. Use Task tool with `guide` (if needed) - Get implementation guidance
-4. Use Task tool with `test` (red → green → blue) with `qa quick` after each phase
-5. Use specialized agents as needed (`architect`, `typesafe`, `monorepo`)
+## Immediate Execution
 
-### Task Completion (Steps 6-7)
-6. Use Task tool with `security` → `review` → `qa` - Quality verification
-7. Execute task completion sequence:
-   - Use Task tool with `tracker` prompt: "complete XX-YY"
-   - Use Task tool with `tracker` prompt: "summary"
+Begin workflow now:
 
-**BEGIN EXECUTION NOW**
+1. Execute Step 0 (parallel state analysis)
+2. Determine task scope automatically
+3. Follow Decision Tree workflow
+4. Document results and next steps

@@ -397,7 +397,7 @@ jobs:
 | Implicit any        | Add explicit type annotation |
 | Non-null assertion  | Use optional chaining (?.)   |
 | Type assertion      | Use type guards instead      |
-| Missing return type | Add explicit return type     |
+| Missing return type | TypeScript inference is acceptable for internal functions (see @eslint.config.js) |
 
 ### 2. SOLID Violations
 
@@ -472,9 +472,10 @@ The Code Reviewer automatically activates when:
   },
   "rules": {
     "noAny": "error",
-    "explicitReturnTypes": "error",
+    "explicitModuleBoundaryTypes": "error",
     "maxLineLength": 100,
-    "maxFileLength": 200
+    "maxFileLength": 200,
+    "maxLinesPerFunction": 100
   },
   "ignore": ["**/*.test.ts", "**/*.spec.ts", "**/migrations/**"]
 }

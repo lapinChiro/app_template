@@ -210,7 +210,7 @@ export class ApiStack extends NestedStack {
 
     // Member API Lambda
     this.memberLambda = new lambda.Function(this, 'MemberApiLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('apps/api-member/dist'),
       environment: {
@@ -224,7 +224,7 @@ export class ApiStack extends NestedStack {
 
     // Admin API Lambda
     this.adminLambda = new lambda.Function(this, 'AdminApiLambda', {
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_22_X,
       handler: 'index.handler',
       code: lambda.Code.fromAsset('apps/api-admin/dist'),
       environment: {
@@ -345,7 +345,7 @@ export class OptionalFeaturesStack extends NestedStack {
     // Async Job Lambda (条件付き作成)
     if (props.enableAsyncJob) {
       this.asyncJobLambda = new lambda.Function(this, 'AsyncJobLambda', {
-        runtime: lambda.Runtime.NODEJS_18_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         handler: 'index.handler',
         code: lambda.Code.fromAsset('apps/async-job/dist'),
         environment: {
@@ -361,7 +361,7 @@ export class OptionalFeaturesStack extends NestedStack {
     // Schedule Lambda (条件付き作成)
     if (props.enableSchedule) {
       this.scheduleLambda = new lambda.Function(this, 'ScheduleLambda', {
-        runtime: lambda.Runtime.NODEJS_18_X,
+        runtime: lambda.Runtime.NODEJS_22_X,
         handler: 'index.handler',
         code: lambda.Code.fromAsset('apps/schedule/dist'),
         environment: {

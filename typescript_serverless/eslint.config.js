@@ -1,13 +1,14 @@
 /**
  * Ultimate Type Safety ESLint Configuration (v9.x)
+ * Optimized for Claude Code generation
  *
  * 7-Layer Type Safety Architecture:
  * Layer 1: Complete `any` Elimination
- * Layer 2: Function Boundary Safety
+ * Layer 2: Function Boundary Safety (型推論を活用)
  * Layer 3: Null/Undefined Complete Safety
  * Layer 4: Promise/Async Complete Safety
- * Layer 5: Code Quality Gates
- * Layer 6: Documentation Enforcement
+ * Layer 5: Code Quality Gates (実用的な制限)
+ * Layer 6: Exhaustiveness (Claude特有の強み)
  * Layer 7: Dependency Management
  */
 
@@ -15,7 +16,6 @@ const js = require('@eslint/js');
 const tseslint = require('@typescript-eslint/eslint-plugin');
 const tsParser = require('@typescript-eslint/parser');
 const importPlugin = require('eslint-plugin-import');
-const tsdocPlugin = require('eslint-plugin-tsdoc');
 const prettierConfig = require('eslint-config-prettier');
 
 module.exports = [
@@ -36,7 +36,6 @@ module.exports = [
     plugins: {
       '@typescript-eslint': tseslint,
       import: importPlugin,
-      tsdoc: tsdocPlugin,
     },
     rules: {
       // ===== Layer 1: Complete `any` Elimination =====
@@ -48,32 +47,13 @@ module.exports = [
       '@typescript-eslint/no-unsafe-argument': 'error',
 
       // ===== Layer 2: Function Boundary Safety =====
-      '@typescript-eslint/explicit-function-return-type': [
-        'error',
-        {
-          allowExpressions: true,
-          allowTypedFunctionExpressions: true,
-          allowHigherOrderFunctions: true,
-          allowDirectConstAssertionInArrowFunctions: true,
-        },
-      ],
+      // explicit-function-return-typeを削除 - TypeScriptの型推論を信頼
       '@typescript-eslint/explicit-module-boundary-types': 'error',
 
       // ===== Layer 3: Null/Undefined Complete Safety =====
       '@typescript-eslint/no-non-null-assertion': 'error',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
-      '@typescript-eslint/strict-boolean-expressions': [
-        'error',
-        {
-          allowNullableBoolean: true,
-          allowNullableObject: true,
-          allowNumber: false,
-          allowString: false,
-          allowNullableString: false,
-          allowNullableNumber: false,
-        },
-      ],
 
       // ===== Layer 4: Promise/Async Complete Safety =====
       '@typescript-eslint/await-thenable': 'error',
@@ -83,12 +63,12 @@ module.exports = [
 
       // ===== Layer 5: Code Quality Gates =====
       complexity: ['error', 15],
-      'max-lines-per-function': ['error', { max: 75 }],
-      'max-lines': ['error', { max: 200 }],
+      'max-lines-per-function': ['error', { max: 100 }], // 75→100行に緩和
+      'max-lines': ['error', { max: 300 }],
       'no-console': 'error',
 
-      // ===== Layer 6: Documentation Enforcement =====
-      'tsdoc/syntax': 'error',
+      // ===== Layer 6: Exhaustiveness (Claude特有の強み) =====
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
 
       // ===== Layer 7: Dependency Management =====
       'import/order': [

@@ -79,7 +79,7 @@ module.exports = {
   testEnvironment: 'node',
 
   // Setup files
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 };
 ```
 
@@ -133,7 +133,7 @@ function createJestConfig(packagePath) {
     ],
 
     // Setup files
-    setupFilesAfterEnv: ['<rootDir>/../../jest.setup.js'],
+    setupFilesAfterEnv: ['<rootDir>/../../jest.setup.ts'],
   };
 }
 
@@ -143,10 +143,25 @@ module.exports = { createJestConfig };
 ### Global Test Setup
 
 ```typescript
-// jest.setup.js
+// jest.setup.ts
 import '@testing-library/jest-dom';
 import { configure } from '@testing-library/react';
 import { server } from './src/test-utils/msw-server';
+
+// TypeScript型定義の拡張
+declare global {
+  var testUser: {
+    id: string;
+    name: string;
+    email: string;
+    role: 'member' | 'admin';
+    isActive: boolean;
+    createdAt: string;
+    updatedAt: string;
+    lastLoginAt: string | null;
+  };
+  var testAdminUser: typeof testUser;
+}
 
 // React Testing Library configuration
 configure({ testIdAttribute: 'data-testid' });
