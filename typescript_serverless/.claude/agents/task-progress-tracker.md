@@ -58,18 +58,25 @@ color: red
   2. `@progress/in-progress/XX-YY.md`ファイルを作成
   3. タスクのYAMLフロントマターで`task_status: 'in_progress'`に更新
 
-#### `complete XX-YY`
+#### `complete XX-YY with handover: [information]`
 
-- **目的**: タスクを完了としてマークし、追跡をクリーンアップ
+- **目的**: タスクを完了としてマークし、追跡をクリーンアップ、引継ぎ情報を記録
 - **使用タイミング**: 全品質チェック合格後
 - **参照ファイル**:
   - `@progress/IN_PROGRESS.md` - 削除対象エントリ
   - `@progress/in-progress/XX-YY.md` - 移動元ファイル
+  - `@progress/HANDOVER.md` - 引継ぎ情報の記録先
 - **処理**:
   1. `@progress/IN_PROGRESS.md`から該当エントリを削除
   2. `@progress/in-progress/XX-YY.md`を`@progress/completed/XX-YY.md`へ移動
   3. タスクのYAMLフロントマターで`task_status: 'completed'`に更新
   4. `blocks_tasks`に含まれるタスクの`depends_on`を更新
+  5. `@progress/HANDOVER.md`に引継ぎ情報を追加:
+     - 生成されたファイル（レポート、ログ等）
+     - 環境状態の変更
+     - 重要なコマンド
+     - 既知の問題や警告
+     - 一時ファイルのクリーンアップ状況
 
 #### `summary`
 
@@ -133,6 +140,7 @@ color: red
 - Progress file moved to @progress/completed/XX-YY.md
 - Actual hours: X.X
 - Unblocked tasks: [XX-YY, XX-YY]
+- Handover notes added to @progress/HANDOVER.md
 ```
 
 #### `summary`の出力
@@ -186,6 +194,7 @@ color: red
 @progress/
 ├── SUMMARY.md          # 全体進捗サマリー（自動更新）
 ├── IN_PROGRESS.md      # 現在進行中のタスク（中断処理に重要）
+├── HANDOVER.md         # タスク引継ぎ情報（自動更新）
 ├── completed/          # 完了タスク記録
 ├── in-progress/        # 進行中タスク
 ├── backlog/           # 保留中タスク
@@ -226,8 +235,14 @@ color: red
    # Step 6: タスク完了マーク（trackerエージェント呼び出し）
    Use Task tool with:
    - subagent_type: "tracker"
-   - prompt: "complete 03-01"
-   → 出力: タスク完了確認メッセージ
+   - prompt: "complete 03-01 with handover: [
+       - Generated: .quality-assurance-report-03-01.md
+       - Environment: Package X installed
+       - Commands: npm test, npm run build
+       - Issues: Known warning about Y
+       - Cleanup: Removed temporary test files
+     ]"
+   → 出力: タスク完了確認メッセージ（HANDOVER.md更新含む）
    
    # Step 7: プロジェクトサマリー更新（trackerエージェント呼び出し）
    Use Task tool with:

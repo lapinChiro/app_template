@@ -8,10 +8,10 @@ Execute optimal task based on current project state and automated workflow selec
 
 ```bash
 # STOP IMMEDIATELY if expected files are missing, except:
-# - First task (01-01): @progress/SUMMARY.md and @progress/IN_PROGRESS.md do not exist yet
+# - First task (01-01): @progress files do not exist yet
 # - After first task: These files MUST exist
 
-if (current_task != "01-01" && !exists("@progress/SUMMARY.md", "@progress/IN_PROGRESS.md")) {
+if (current_task != "01-01" && !exists("@progress/SUMMARY.md", "@progress/IN_PROGRESS.md", "@progress/HANDOVER.md")) {
   STOP("❌ Missing required progress files. Run task 01-01 first.");
 }
 
@@ -26,6 +26,7 @@ if (!exists("@docs/impl/**", "@CLAUDE.md", "@tasks/**/*.md")) {
 ```bash
 # Parallel execution for state check
 Parallel: 
+  Read @progress/HANDOVER.md,
   Read @progress/SUMMARY.md,
   Read @progress/IN_PROGRESS.md,
   Use Task tool with subagent_type: "tracker", prompt: "analyze"
@@ -47,19 +48,19 @@ file_count = count_modified_files(task_description)
 #### No Code Changes (config/style/docs only)
 
 ```bash
-implement → qa
+implement → qa → tracker:complete
 ```
 
 #### 1-2 Files
 
 ```bash
-test:red → implement → test:green → qa
+test:red → implement → test:green → qa → tracker:complete
 ```
 
 #### 3-5 Files
 
 ```bash
-test:red → implement → test:green → test:blue → review → qa
+test:red → implement → test:green → test:blue → review → qa → tracker:complete
 ```
 
 #### 6+ Files
@@ -99,7 +100,7 @@ Use Task tool with subagent_type: "qa"                     # Full quality check
 
 # Task Management
 Use Task tool with subagent_type: "tracker", prompt: "start XX-YY"
-Use Task tool with subagent_type: "tracker", prompt: "complete XX-YY"
+Use Task tool with subagent_type: "tracker", prompt: "complete XX-YY with handover: [generated files, environment changes, important commands, known issues]"    # Updates SUMMARY.md, IN_PROGRESS.md, and HANDOVER.md
 
 # Code Review and Architecture
 Use Task tool with subagent_type: "review"      # SOLID principles check
@@ -144,6 +145,18 @@ Parallel:
 
 ## Progress Documentation
 
+### Automatic Updates by tracker:complete
+
+The tracker agent automatically updates:
+- @progress/SUMMARY.md - Task completion summary
+- @progress/IN_PROGRESS.md - Clear current task
+- @progress/HANDOVER.md - Record handover information:
+  - Generated artifacts (reports, logs)
+  - Environment state changes
+  - Known issues or warnings
+  - Special commands used
+  - Temporary files created/cleaned
+
 ### Simple Tasks (1-5 files)
 
 ```yaml
@@ -178,7 +191,7 @@ decisions:
 - ✅ Zero ESLint errors  
 - ✅ All tests passing
 - ✅ Build successful
-- ✅ Progress documented
+- ✅ Progress and handover documented (tracker:complete executed)
 
 ## Fallback Commands (SubAgent unavailable)
 
@@ -197,7 +210,8 @@ npx tsc --noEmit --strict
 
 Begin workflow now:
 
-1. Execute Step 0 (parallel state analysis)
+1. Execute Step 0 (parallel state analysis including @progress/HANDOVER.md)
 2. Determine task scope automatically
 3. Follow Decision Tree workflow
-4. Document results and next steps
+4. Execute tracker:complete with handover information
+5. Verify all Quality Validation checks are complete
