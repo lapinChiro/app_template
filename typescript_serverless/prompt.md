@@ -4,6 +4,23 @@ Execute optimal task based on current project state and automated workflow selec
 
 ## Execution Sequence
 
+### Pre-Flight Check: File Existence Validation
+
+```bash
+# STOP IMMEDIATELY if expected files are missing, except:
+# - First task (01-01): @progress/SUMMARY.md and @progress/IN_PROGRESS.md do not exist yet
+# - After first task: These files MUST exist
+
+if (current_task != "01-01" && !exists("@progress/SUMMARY.md", "@progress/IN_PROGRESS.md")) {
+  STOP("❌ Missing required progress files. Run task 01-01 first.");
+}
+
+# Check other critical files
+if (!exists("@docs/impl/**", "@CLAUDE.md", "@tasks/**/*.md")) {
+  STOP("❌ Missing critical project files. Verify repository integrity.");
+}
+```
+
 ### Step 0: Project State Analysis (MANDATORY)
 
 ```bash
