@@ -21,8 +21,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
+    "test": "jest --watchAll=false",
+    "test:watch": "jest --watchAll",
+    "test:coverage": "jest --coverage --watchAll=false",
     "lint": "eslint src --ext .ts"
   },
   "devDependencies": {

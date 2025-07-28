@@ -5,15 +5,15 @@
   "type": "commonjs",
   "scripts": {
     "build": "tsc -b",
-    "test": "jest",
+    "test": "jest --watchAll=false",
+    "test:watch": "jest --watchAll",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.515.0",
     "@aws-sdk/lib-dynamodb": "^3.515.0",
-    "@shared/types": "workspace:*",
-    "@shared/utils": "workspace:*",
+    "@shared/core": "workspace:*",
     "zod": "^3.22.4"
   },
   "devDependencies": {

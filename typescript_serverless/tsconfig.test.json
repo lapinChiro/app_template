@@ -5,7 +5,16 @@
   },
   "include": [
     "tests/**/*.ts",
-    "tests/**/*.tsx"
+    "tests/**/*.tsx",
+    "packages/*/src/**/*.test.ts",
+    "packages/*/src/**/*.test.tsx",
+    "packages/*/src/**/*.spec.ts",
+    "packages/*/src/**/*.spec.tsx",
+    "packages/*/src/**/*.stories.tsx",
+    "apps/*/src/**/*.test.ts",
+    "apps/*/src/**/*.test.tsx",
+    "apps/*/src/**/*.spec.ts",
+    "apps/*/src/**/*.spec.tsx"
   ],
   "exclude": [
     "node_modules"

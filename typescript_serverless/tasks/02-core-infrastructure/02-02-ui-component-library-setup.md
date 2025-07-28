@@ -361,7 +361,7 @@ pnpm add @ui/components@workspace:*
 
 ## Progress
 
-- [ ] Started
-- [ ] Implementation complete
-- [ ] Verified
-- [ ] Documented
+- [x] Started
+- [x] Implementation complete
+- [x] Verified
+- [x] Documented

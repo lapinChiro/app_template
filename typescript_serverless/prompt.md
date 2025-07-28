@@ -30,11 +30,15 @@ Read: [selected_task_file]
 2. `test:red` - Write failing test
 3. `implement` - Write code to pass test
 4. `test:green` - Verify test passes
-5. `test:blue` - Refactor code
-6. `security` - Security audit (ALWAYS run for comprehensive quality)
-7. `review` - Code review for SOLID principles
-8. `qa` - Final quality check
-9. `tracker:complete` - Mark task complete with handover
+5. **MANDATORY: `qa:quick` - Fix ESLint/TypeScript errors immediately**
+6. `test:blue` - Refactor code  
+7. **MANDATORY: `qa:quick` - Fix any new errors from refactoring**
+8. `security` - Security audit (ALWAYS run for comprehensive quality)
+9. `review` - Code review for SOLID principles
+10. `qa` - Final quality check
+11. `tracker:complete` - Mark task complete with handover
+
+**CRITICAL**: Steps 5 and 7 (qa:quick) are MANDATORY. If errors are found, they MUST be fixed before proceeding to the next step. Skipping these steps will result in error accumulation.
 
 #### Additional Specialized Agents (Add based on task context)
 
@@ -59,15 +63,20 @@ When modifying Docker files:
 
 ```bash
 # Test-Driven Development (t_wada's TDD)
-Use Task tool with subagent_type: "test", prompt: "red [function/class name]"   # Write failing test
-Use Task tool with subagent_type: "test", prompt: "green"                       # Verify test passes
-Use Task tool with subagent_type: "test", prompt: "blue"                        # Refactor with tests
+Use Task tool with subagent_type: "test", prompt: "red [FULL_PATH/component_name]"   # Write failing test
+# CRITICAL: Always use FULL PATH (e.g., "red packages/ui/src/components/Button")
+# Never use just component name (e.g., "red Button") - this will create test in wrong location
+Use Task tool with subagent_type: "test", prompt: "green"                            # Verify test passes
+Use Task tool with subagent_type: "test", prompt: "blue"                             # Refactor with tests
 
 # Quality Assurance
 Use Task tool with subagent_type: "qa"                     # Full quality analysis
-Use Task tool with subagent_type: "qa", prompt: "quick"    # Quick check with auto-fix during TDD
+Use Task tool with subagent_type: "qa", prompt: "quick"    # Quick check with auto-fix during TDD (MANDATORY after test:green and test:blue)
 Use Task tool with subagent_type: "qa", prompt: "fix"      # Fix auto-fixable issues
 Use Task tool with subagent_type: "qa", prompt: "report"   # Generate detailed report
+
+# CRITICAL: qa:quick MUST be run after test:green and test:blue
+# If qa:quick finds errors, workflow MUST stop until all errors are fixed
 
 # Task Management
 Use Task tool with subagent_type: "tracker", prompt: "analyze"        # Analyze and select task
@@ -156,15 +165,29 @@ Single message containing multiple tool calls:
 ### Immediate Stop Conditions
 
 - TypeScript compilation errors
-- ESLint errors (not warnings)
+- ESLint errors (not warnings)  
 - Build failures
 - Security vulnerabilities
+
+### MANDATORY Quality Checkpoints
+
+After EACH of these steps, run `qa:quick`:
+
+- After `test:green` - MUST run before proceeding to refactoring
+- After `test:blue` - MUST run before security check
+
+If `qa:quick` finds ANY errors:
+
+1. **STOP immediately** - Do NOT proceed to next step
+2. Fix all errors using `qa:fix` or manual fixes
+3. Run `qa:quick` again to verify all errors are fixed
+4. Only then proceed to next step
 
 ### Resolution Sequence
 
 1. Stop current workflow
 2. Fix error immediately
-3. Run `qa` to verify fix
+3. Run `qa:quick` to verify fix (not just `qa`)
 4. Resume from interruption point
 
 ## Progress Tracking
@@ -260,8 +283,24 @@ When user types `/dev`, immediately execute:
 
 1. **Step 0**: Use tracker agent to analyze project state and select optimal task
 2. **Step 1**: Read selected task file for detailed requirements
-3. **Step 2**: Execute core workflow agents for ALL tasks (including security)
-4. **Step 2+**: Add specialized agents based on task context
+3. **Step 2**: Execute core workflow agents for ALL tasks in EXACT order:
+   - tracker:start
+   - test:red (with FULL PATH)
+   - implement
+   - test:green
+   - **qa:quick (MANDATORY - STOP if errors found)**
+   - test:blue
+   - **qa:quick (MANDATORY - STOP if errors found)**
+   - security
+   - review
+   - qa (final check)
+   - tracker:complete
+4. **Step 3**: Add specialized agents based on task context
 5. **Complete**: Use tracker:complete with comprehensive handover
 
-**Key principle**: One workflow for all tasks with comprehensive quality assurance. Security is not optional.
+**Key principles**:
+
+- One workflow for all tasks with comprehensive quality assurance
+- Security is not optional
+- qa:quick after test:green and test:blue is MANDATORY
+- If ANY errors are found, STOP and fix before proceeding
