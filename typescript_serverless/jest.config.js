@@ -19,4 +19,12 @@ module.exports = {
       statements: 90,
     },
   },
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  transform: {
+    '^.+\\.ts$': ['ts-jest', {
+      tsconfig: {
+        importHelpers: false,
+      },
+    }],
+  },
 };

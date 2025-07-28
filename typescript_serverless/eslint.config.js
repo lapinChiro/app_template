@@ -25,7 +25,8 @@ module.exports = [
     languageOptions: {
       parser: tsParser,
       parserOptions: {
-        project: './tsconfig.json',
+        project: true,
+        tsconfigRootDir: __dirname,
         ecmaVersion: 2022,
         sourceType: 'module',
         ecmaFeatures: {
@@ -132,6 +133,13 @@ module.exports = [
   // Test files configuration
   {
     files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+    languageOptions: {
+      parser: tsParser,
+      parserOptions: {
+        project: './tsconfig.test.json',
+        tsconfigRootDir: __dirname,
+      },
+    },
     rules: {
       '@typescript-eslint/explicit-function-return-type': 'off',
       '@typescript-eslint/explicit-module-boundary-types': 'off',

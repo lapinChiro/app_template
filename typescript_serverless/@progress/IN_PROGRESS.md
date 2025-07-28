@@ -1,3 +1,3 @@
 # In Progress Tasks
 
-No tasks currently in progress.
+*No tasks currently in progress*
