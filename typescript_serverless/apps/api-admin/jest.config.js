@@ -2,7 +2,7 @@ const base = require('../../jest.config.base');
 
 module.exports = {
   ...base,
-  displayName: 'api-member',
+  displayName: 'api-admin',
   testEnvironment: 'node',
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   moduleNameMapper: {

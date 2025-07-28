@@ -2,7 +2,7 @@
   "name": "@app/api-admin",
   "version": "1.0.0",
   "private": true,
-  "type": "module",
+  "type": "commonjs",
   "scripts": {
     "build": "tsc -b",
     "test": "jest",

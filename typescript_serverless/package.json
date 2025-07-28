@@ -7,9 +7,9 @@
     "doc": "docs"
   },
   "scripts": {
-    "test": "jest",
+    "test": "pnpm -r test",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test:coverage": "pnpm -r test -- --coverage",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc --noEmit",
