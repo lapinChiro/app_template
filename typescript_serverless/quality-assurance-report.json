@@ -1,0 +1,148 @@
+{
+  "status": "fail",
+  "timestamp": "2025-07-29T07:27:40Z",
+  "duration": "30.5s",
+  
+  "summary": {
+    "score": 65,
+    "passed": 3,
+    "failed": 2,
+    "warnings": 3
+  },
+  
+  "details": {
+    "typescript": {
+      "errors": 0,
+      "warnings": 0,
+      "status": "pass",
+      "notes": "Active packages type checking passed"
+    },
+    
+    "eslint": {
+      "errors": 0,
+      "warnings": 0,
+      "fixable": 0,
+      "status": "pass",
+      "notes": "No linting errors found"
+    },
+    
+    "tests": {
+      "total": 467,
+      "passed": 458,
+      "failed": 5,
+      "skipped": 4,
+      "coverage": {
+        "statements": "not available",
+        "branches": "not available",
+        "functions": "not available",
+        "lines": "not available"
+      },
+      "status": "fail",
+      "notes": "Tests in @shared/core failing"
+    },
+    
+    "build": {
+      "success": false,
+      "time": "N/A",
+      "size": {
+        "raw": "N/A",
+        "gzipped": "N/A"
+      },
+      "status": "fail",
+      "notes": "Next.js apps missing dependencies"
+    },
+    
+    "security": {
+      "vulnerabilities": {
+        "critical": 0,
+        "high": 0,
+        "moderate": 0,
+        "low": 0
+      },
+      "status": "pass",
+      "notes": "No vulnerabilities found"
+    },
+    
+    "performance": {
+      "lcp": "N/A",
+      "fid": "N/A",
+      "cls": "N/A",
+      "status": "warning",
+      "notes": "Cannot measure without successful build"
+    }
+  },
+  
+  "failures": [
+    {
+      "type": "test",
+      "package": "@shared/core",
+      "file": "src/repositories/__tests__/user.repository.update.test.ts",
+      "test": "should update user with valid input",
+      "error": "expected null to deeply equal { id: 'user-123', ...}"
+    },
+    {
+      "type": "test",
+      "package": "@shared/core",
+      "file": "src/repositories/__tests__/user.repository.update.test.ts",
+      "test": "should update user role",
+      "error": "expected null to deeply equal { id: 'user-123', ...}"
+    },
+    {
+      "type": "test",
+      "package": "@shared/core",
+      "file": "src/repositories/__tests__/user.repository.update.test.ts",
+      "test": "should update user last login timestamp",
+      "error": "expected undefined to deeply equal { id: 'user-123', ...}"
+    },
+    {
+      "type": "test",
+      "package": "@shared/core",
+      "file": "src/repositories/__tests__/user.repository.update.test.ts",
+      "test": "should return false when deleting non-existent user",
+      "error": "expected true to be false"
+    },
+    {
+      "type": "test",
+      "package": "@shared/core",
+      "file": "src/repositories/__tests__/user.repository.query.test.ts",
+      "test": "should return users with specific role",
+      "error": "expected spy to be called with arguments"
+    },
+    {
+      "type": "build",
+      "package": "web-admin",
+      "error": "next: not found - missing dependencies"
+    },
+    {
+      "type": "build",
+      "package": "web-member",
+      "error": "next: not found - missing dependencies"
+    }
+  ],
+  
+  "warnings": [
+    {
+      "type": "dependency",
+      "message": "Next.js apps have missing node_modules",
+      "severity": "high"
+    },
+    {
+      "type": "test",
+      "message": "Coverage data not available due to test failures",
+      "severity": "moderate"
+    },
+    {
+      "type": "performance",
+      "message": "Cannot validate performance metrics without successful build",
+      "severity": "low"
+    }
+  ],
+  
+  "recommendations": [
+    "Fix failing tests in UserRepository update operations",
+    "Install dependencies in web-admin and web-member apps",
+    "Run 'pnpm install' in the root directory to ensure all workspace dependencies are installed",
+    "Re-run tests with coverage after fixing test failures",
+    "Verify build success after dependency installation"
+  ]
+}

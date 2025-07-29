@@ -1,0 +1,123 @@
+{
+  "status": "warning",
+  "timestamp": "2025-07-29T17:32:00Z",
+  "duration": "45.3s",
+  "summary": {
+    "score": 85,
+    "passed": 46,
+    "failed": 0,
+    "warnings": 7
+  },
+  "details": {
+    "typescript": {
+      "errors": 0,
+      "warnings": 0,
+      "status": "pass"
+    },
+    "eslint": {
+      "errors": 0,
+      "warnings": 0,
+      "fixable": 0,
+      "status": "pass"
+    },
+    "tests": {
+      "total": 465,
+      "passed": 463,
+      "failed": 0,
+      "skipped": 2,
+      "coverage": {
+        "statements": "67.85%",
+        "branches": "85.46%",
+        "functions": "78.82%",
+        "lines": "67.85%"
+      },
+      "status": "warning"
+    },
+    "build": {
+      "success": true,
+      "time": "2.5s",
+      "size": {
+        "raw": "2.0MB",
+        "files": 33
+      },
+      "status": "pass"
+    },
+    "security": {
+      "vulnerabilities": {
+        "critical": 0,
+        "high": 0,
+        "moderate": 6,
+        "low": 0
+      },
+      "status": "warning"
+    },
+    "dependencies": {
+      "outdated": {
+        "major": 4,
+        "minor": 0,
+        "patch": 0
+      },
+      "status": "warning"
+    },
+    "codeQuality": {
+      "sourceFiles": 33,
+      "testFiles": 47,
+      "testRatio": 1.42,
+      "linesOfCode": 3055,
+      "avgLinesPerFile": 92.6,
+      "status": "pass"
+    }
+  },
+  "warnings": [
+    {
+      "type": "coverage",
+      "severity": "medium",
+      "message": "Test coverage is below 90% threshold (67.85%)"
+    },
+    {
+      "type": "security",
+      "package": "esbuild",
+      "severity": "moderate",
+      "message": "esbuild enables any website to send any requests to the development server"
+    },
+    {
+      "type": "security",
+      "package": "vite",
+      "severity": "moderate",
+      "message": "Depends on vulnerable versions of esbuild"
+    },
+    {
+      "type": "dependency",
+      "package": "@types/node",
+      "current": "22.16.5",
+      "latest": "24.1.0",
+      "message": "Major version update available"
+    },
+    {
+      "type": "dependency",
+      "package": "vitest",
+      "current": "2.1.9",
+      "latest": "3.2.4",
+      "message": "Major version update available"
+    },
+    {
+      "type": "dependency",
+      "package": "zod",
+      "current": "3.25.76",
+      "latest": "4.0.11",
+      "message": "Major version update available"
+    },
+    {
+      "type": "build",
+      "message": "CJS build of Vite's Node API is deprecated"
+    }
+  ],
+  "recommendations": [
+    "Increase test coverage to meet 90% threshold across all metrics",
+    "Update vitest to v3.x to fix security vulnerabilities",
+    "Consider migrating to ESM modules to resolve Vite CJS deprecation",
+    "Update @types/node to latest major version",
+    "Review and update zod to v4.x (may have breaking changes)",
+    "Focus on testing untested files in auth/google-oauth and repositories"
+  ]
+}
