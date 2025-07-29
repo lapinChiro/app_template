@@ -1,0 +1,114 @@
+services:
+  # Core services (always run)
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    ports:
+      - "8000:8000"
+    volumes:
+      - dynamodb_data:/data
+    command: "-jar DynamoDBLocal.jar -sharedDb -dbPath /data"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/shell/ || exit 1"]
+      interval: 5s
+      timeout: 2s
+      retries: 3
+
+  # Application services
+  web-member:
+    build:
+      context: .
+      target: development
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./apps/web-member:/app/apps/web-member
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/web-member/node_modules
+      - /app/packages/shared/node_modules
+      - /app/packages/ui/node_modules
+    environment:
+      NODE_ENV: development
+      DYNAMODB_ENDPOINT: http://dynamodb:8000
+    depends_on:
+      dynamodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "web-member", "dev"]
+
+  api-member:
+    build:
+      context: .
+      target: development
+    ports:
+      - "4000:4000"
+    volumes:
+      - ./apps/api-member:/app/apps/api-member
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/api-member/node_modules
+      - /app/packages/shared/node_modules
+    environment:
+      NODE_ENV: development
+      DYNAMODB_ENDPOINT: http://dynamodb:8000
+      PORT: 4000
+    depends_on:
+      dynamodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "api-member", "dev"]
+
+  # Optional services (profile-based)
+  web-admin:
+    profiles:
+      - admin
+      - full
+    build:
+      context: .
+      target: development
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./apps/web-admin:/app/apps/web-admin
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/web-admin/node_modules
+      - /app/packages/shared/node_modules
+      - /app/packages/ui/node_modules
+    environment:
+      NODE_ENV: development
+      DYNAMODB_ENDPOINT: http://dynamodb:8000
+    depends_on:
+      dynamodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "web-admin", "dev"]
+
+  api-admin:
+    profiles:
+      - admin
+      - full
+    build:
+      context: .
+      target: development
+    ports:
+      - "4001:4000"
+    volumes:
+      - ./apps/api-admin:/app/apps/api-admin
+      - ./packages:/app/packages
+      - /app/node_modules
+      - /app/apps/api-admin/node_modules
+      - /app/packages/shared/node_modules
+    environment:
+      NODE_ENV: development
+      DYNAMODB_ENDPOINT: http://dynamodb:8000
+      PORT: 4000
+    depends_on:
+      dynamodb:
+        condition: service_healthy
+    command: ["pnpm", "--filter", "api-admin", "dev"]
+
+volumes:
+  dynamodb_data:
+    driver: local
+
+networks:
+  default:
+    driver: bridge

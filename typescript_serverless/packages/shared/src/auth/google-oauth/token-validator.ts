@@ -8,7 +8,6 @@ export class TokenValidator {
   private static readonly GOOGLE_ISSUER = 'https://accounts.google.com';
   private static readonly GOOGLE_CERTS_URL = 'https://www.googleapis.com/oauth2/v3/certs';
   private static certCache: { jwks: jose.JSONWebKeySet; expiry: number } | null = null;
-  private static stringCertCache: { certs: Record<string, string>; expiry: number } | null = null;
   private readonly clientId: string;
   private readonly hostedDomain?: string;
 
@@ -213,7 +212,7 @@ export class TokenValidator {
     return Date.now() >= exp * 1000;
   }
 
-  // Instance methods that delegate to static methods
+  // Instance methods - unified interface
   async validateAccessToken(accessToken: string): Promise<{ valid: boolean; payload?: { access_token: string; scope?: string; expires_in?: number; token_type: string }; error?: string }> {
     try {
       const result = await TokenValidator.verifyAccessToken(accessToken);
@@ -234,13 +233,7 @@ export class TokenValidator {
 
   async validateIdToken(idToken: string, nonce?: string): Promise<{ valid: boolean; payload?: IdTokenPayload; error?: string }> {
     try {
-      const config: GoogleAuthConfig = {
-        clientId: this.clientId,
-        clientSecret: '', // Not needed for validation
-        redirectUri: '', // Not needed for validation
-        hostedDomain: this.hostedDomain,
-      };
-      const payload = await TokenValidator.verifyIdToken(idToken, config, nonce);
+      const payload = await this.verifyIdToken(idToken, nonce);
       return { valid: true, payload };
     } catch (error) {
       if (error instanceof OAuthError) {
@@ -261,13 +254,7 @@ export class TokenValidator {
     return TokenValidator.getGoogleCerts();
   }
 
-  async verifyJWT(
-    token: string,
-    nonce?: string
-  ): Promise<{ valid: boolean; payload?: IdTokenPayload; error?: string }> {
-    return this.validateIdToken(token, nonce);
-  }
-
+  // Main instance method for ID token verification
   async verifyIdToken(idToken: string, nonce?: string): Promise<IdTokenPayload> {
     const config: GoogleAuthConfig = {
       clientId: this.clientId,
@@ -278,37 +265,17 @@ export class TokenValidator {
     return TokenValidator.verifyIdToken(idToken, config, nonce);
   }
   
+  // Legacy method - converts JWKS to string format for backward compatibility
   static async getCertificates(): Promise<Record<string, string>> {
-    const now = Date.now();
-
-    if (this.stringCertCache && this.stringCertCache.expiry > now) {
-      return this.stringCertCache.certs;
-    }
-
     try {
       const response = await fetch(this.GOOGLE_CERTS_URL);
       if (!response.ok) {
         throw new Error('Failed to fetch Google certificates');
       }
-      const result = await response.json() as Record<string, string>;
       
-      // Cache the result for 1 hour
-      this.stringCertCache = {
-        certs: result,
-        expiry: now + 3600000,
-      };
-      
-      return result;
+      return await response.json() as Record<string, string>;
     } catch (error) {
       throw new Error(`Failed to fetch Google certificates: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
-  }
-
-  static async verifyJWT(
-    token: string,
-    config: GoogleAuthConfig,
-    nonce?: string
-  ): Promise<IdTokenPayload> {
-    return this.verifyIdToken(token, config, nonce);
   }
 }

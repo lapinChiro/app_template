@@ -28,10 +28,6 @@ describe('TokenValidator - Certificates', () => {
     });
 
     it('should throw error when fetching certificates fails', async () => {
-      // Clear cache to ensure fresh request
-      // @ts-expect-error accessing private property for testing
-      TokenValidator.stringCertCache = null;
-
       global.fetch = vi.fn().mockResolvedValueOnce({
         ok: false,
         status: 500,
@@ -48,10 +44,6 @@ describe('TokenValidator - Certificates', () => {
         'key1': '-----BEGIN CERTIFICATE-----\nMIIDJzCCAg...\n-----END CERTIFICATE-----',
       };
 
-      // Clear any existing cache first
-      // @ts-expect-error accessing private property for testing
-      TokenValidator.stringCertCache = null;
-
       global.fetch = vi.fn().mockResolvedValue({
         ok: true,
         json: () => Promise.resolve(mockCerts),
@@ -61,12 +53,12 @@ describe('TokenValidator - Certificates', () => {
       const certs1 = await TokenValidator.getCertificates();
       expect(certs1).toEqual(mockCerts);
 
-      // Second call should use cache
+      // Second call (note: getCertificates now doesn't use cache, but getGoogleCerts does)
       const certs2 = await TokenValidator.getCertificates();
       expect(certs2).toEqual(mockCerts);
 
-      // Fetch should only be called once due to caching
-      expect(global.fetch).toHaveBeenCalledTimes(1);
+      // Both calls will hit the network since getCertificates doesn't cache
+      expect(global.fetch).toHaveBeenCalledTimes(2);
     });
   });
 });
