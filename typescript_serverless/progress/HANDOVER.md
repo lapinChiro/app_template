@@ -1,6 +1,6 @@
 ---
-last_updated: '2025-07-29T15:10:00Z'
-total_handovers: 8
+last_updated: '2025-07-29T17:00:00Z'
+total_handovers: 10
 ---
 
 # Task Handover Log
@@ -9,6 +9,26 @@ total_handovers: 8
 This file tracks important handover information from completed tasks including generated files, environment changes, and any issues encountered during development.
 
 ## Recent Handovers
+
+### Task ID Mapping and Consistency Check
+**Completed**: 2025-07-29T17:00:00Z
+**Developer**: claude
+
+**Handover Information**:
+  - Generated: TASK_MAPPING.md - ID対応表（ファイル名XX-XX ⇔ タスクIDTASK-XXX）
+  - Problem: ファイル名(01-01)と依存関係記載(TASK-005)の形式が異なる
+  - Solution: TASK_MAPPING.md参照で依存タスクのファイルを特定
+  - Status: 全25タスク存在確認済み、内容一致
+  - Action: 作業時はTASK_MAPPING.md必須、既存ファイル名変更不可
+
+### Task Directory Structure Cleanup
+**Completed**: 2025-07-29T16:30:00Z
+**Developer**: claude
+
+**Handover Information**:
+  - Removed: 08-member-frontend/, 09-13の空ディレクトリ6個削除
+  - Fixed: TASK_INDEX.mdの欠落リンク18箇所追加
+  - Status: 8フェーズ構成確定、全25タスクファイル存在確認済み
 
 ### Test Coverage Standards Configuration
 **Completed**: 2025-07-29T15:10:00Z

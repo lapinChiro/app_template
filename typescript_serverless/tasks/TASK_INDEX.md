@@ -15,8 +15,8 @@
 
 | Task ID | Title | Estimated | Dependencies | Status |
 |---------|-------|-----------|--------------|--------|
-| 02-01 | Shared Package Setup | 2h | 01-02 | ⬜ Not Started |
-| 02-02 | UI Component Library Setup | 4h | 01-02 | ⬜ Not Started |
+| [02-01](./02-core-infrastructure/02-01-shared-package-setup.md) | Shared Package Setup | 2h | 01-02 | ⬜ Not Started |
+| [02-02](./02-core-infrastructure/02-02-ui-component-library-setup.md) | UI Component Library Setup | 4h | 01-02 | ⬜ Not Started |
 | [02-03](./02-core-infrastructure/02-03-zod-schema-definitions.md) | Zod Schema Definitions | 3h | 02-01 | ⬜ Not Started |
 
 ## Phase 3: Authentication System (High)
@@ -24,48 +24,48 @@
 | Task ID | Title | Estimated | Dependencies | Status |
 |---------|-------|-----------|--------------|--------|
 | [03-01](./03-authentication-system/03-01-google-oauth-implementation.md) | Google OAuth Implementation | 4h | 02-01, 02-03 | ⬜ Not Started |
-| 03-02 | User Repository Implementation | 3h | 02-03 | ⬜ Not Started |
-| 03-03 | Auth Middleware & Guards | 2h | 03-01 | ⬜ Not Started |
+| [03-02](./03-authentication-system/03-02-user-repository-implementation.md) | User Repository Implementation | 3h | 02-03 | ⬜ Not Started |
+| [03-03](./03-authentication-system/03-03-auth-middleware-guards.md) | Auth Middleware & Guards | 2h | 03-01 | ⬜ Not Started |
 
 ## Phase 4: Frontend Applications (Medium)
 
 | Task ID | Title | Estimated | Dependencies | Status |
 |---------|-------|-----------|--------------|--------|
-| 04-01 | Member Next.js App Setup | 3h | 02-02, 03-01 | ⬜ Not Started |
-| 04-02 | Admin Next.js App Setup | 3h | 02-02, 03-01 | ⬜ Not Started |
-| 04-03 | Admin CRUD UI Implementation | 4h | 04-02, 03-03 | ⬜ Not Started |
+| [04-01](./04-frontend-applications/04-01-member-nextjs-app-setup.md) | Member Next.js App Setup | 3h | 02-02, 03-01 | ⬜ Not Started |
+| [04-02](./04-frontend-applications/04-02-admin-nextjs-app-setup.md) | Admin Next.js App Setup | 3h | 02-02, 03-01 | ⬜ Not Started |
+| [04-03](./04-frontend-applications/04-03-admin-crud-ui-implementation.md) | Admin CRUD UI Implementation | 4h | 04-02, 03-03 | ⬜ Not Started |
 
 ## Phase 5: API Implementation (Medium)
 
 | Task ID | Title | Estimated | Dependencies | Status |
 |---------|-------|-----------|--------------|--------|
-| 05-01 | Member API Routes | 3h | 02-03, 03-03 | ⬜ Not Started |
-| 05-02 | Admin API Routes | 4h | 02-03, 03-03, 03-02 | ⬜ Not Started |
-| 05-03 | OpenAPI Documentation Generation | 2h | 05-01, 05-02 | ⬜ Not Started |
+| [05-01](./05-api-implementation/05-01-member-api-routes.md) | Member API Routes | 3h | 02-03, 03-03 | ⬜ Not Started |
+| [05-02](./05-api-implementation/05-02-admin-api-routes.md) | Admin API Routes | 4h | 02-03, 03-03, 03-02 | ⬜ Not Started |
+| [05-03](./05-api-implementation/05-03-openapi-documentation.md) | OpenAPI Documentation Generation | 2h | 05-01, 05-02 | ⬜ Not Started |
 
 ## Phase 6: Testing Infrastructure (High)
 
 | Task ID | Title | Estimated | Dependencies | Status |
 |---------|-------|-----------|--------------|--------|
 | [06-01](./06-testing-infrastructure/06-01-unit-test-setup.md) | Unit Test Setup | 2h | 01-02 | ⬜ Not Started |
-| 06-02 | Integration Test Setup | 3h | 06-01 | ⬜ Not Started |
-| 06-03 | E2E Test Setup | 3h | 04-01, 04-02 | ⬜ Not Started |
+| [06-02](./06-testing-infrastructure/06-02-integration-test-setup.md) | Integration Test Setup | 3h | 06-01 | ⬜ Not Started |
+| [06-03](./06-testing-infrastructure/06-03-e2e-test-setup.md) | E2E Test Setup | 3h | 04-01, 04-02 | ⬜ Not Started |
 
 ## Phase 7: Infrastructure as Code (High)
 
 | Task ID | Title | Estimated | Dependencies | Status |
 |---------|-------|-----------|--------------|--------|
-| 07-01 | CDK Project Setup | 2h | 01-01 | ⬜ Not Started |
-| 07-02 | Core Infrastructure Stack | 4h | 07-01 | ⬜ Not Started |
-| 07-03 | Optional Features Stack | 3h | 07-02 | ⬜ Not Started |
+| [07-01](./07-infrastructure-as-code/07-01-cdk-project-setup.md) | CDK Project Setup | 2h | 01-01 | ⬜ Not Started |
+| [07-02](./07-infrastructure-as-code/07-02-core-infrastructure-stack.md) | Core Infrastructure Stack | 4h | 07-01 | ⬜ Not Started |
+| [07-03](./07-infrastructure-as-code/07-03-optional-features-stack.md) | Optional Features Stack | 3h | 07-02 | ⬜ Not Started |
 
 ## Phase 8: CI/CD & Automation (Medium)
 
 | Task ID | Title | Estimated | Dependencies | Status |
 |---------|-------|-----------|--------------|--------|
-| 08-01 | GitHub Actions Setup | 3h | 06-01 | ⬜ Not Started |
-| 08-02 | Project Initialization Script | 4h | 01-01 | ⬜ Not Started |
-| 08-03 | Developer Documentation | 2h | All tasks | ⬜ Not Started |
+| [08-01](./08-cicd-automation/08-01-github-actions-setup.md) | GitHub Actions Setup | 3h | 06-01 | ⬜ Not Started |
+| [08-02](./08-cicd-automation/08-02-project-initialization-script.md) | Project Initialization Script | 4h | 01-01 | ⬜ Not Started |
+| [08-03](./08-cicd-automation/08-03-developer-documentation.md) | Developer Documentation | 2h | All tasks | ⬜ Not Started |
 
 ## Summary
 
