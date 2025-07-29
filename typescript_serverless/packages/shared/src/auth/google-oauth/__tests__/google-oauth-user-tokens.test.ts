@@ -9,7 +9,6 @@ vi.mock('../token-validator', () => ({
   },
 }));
 
-// eslint-disable-next-line max-lines-per-function
 describe('GoogleOAuth - User Info and Token Management', () => {
   const mockClientId = 'test-client-id.apps.googleusercontent.com';
   const mockClientSecret = 'test-client-secret';
@@ -168,6 +167,22 @@ describe('GoogleOAuth - User Info and Token Management', () => {
         'Failed to revoke token'
       );
     });
+  });
+});
+
+describe('GoogleOAuth - ID Token Verification', () => {
+  const mockClientId = 'test-client-id.apps.googleusercontent.com';
+  const mockClientSecret = 'test-client-secret';
+  const mockRedirectUri = 'https://example.com/callback';
+  let googleOAuth: GoogleOAuth;
+
+  beforeEach(() => {
+    googleOAuth = new GoogleOAuth({
+      clientId: mockClientId,
+      clientSecret: mockClientSecret,
+      redirectUri: mockRedirectUri,
+    });
+    vi.clearAllMocks();
   });
 
   describe('verifyIdToken', () => {

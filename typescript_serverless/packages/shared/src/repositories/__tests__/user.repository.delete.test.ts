@@ -81,8 +81,7 @@ describe('UserRepository - Delete Operations', () => {
       expect(result).toBe(true);
       expect(mockDbClient.update).toHaveBeenCalledWith(userId, {
         isActive: false,
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        deletedAt: expect.any(String),
+        deletedAt: expect.any(String) as string,
       });
     });
 

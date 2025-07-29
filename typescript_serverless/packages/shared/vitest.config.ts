@@ -16,6 +16,11 @@ export default defineConfig({
         'src/test-utils/**',
       ],
     },
+    server: {
+      deps: {
+        inline: ['uuid', 'jose'],
+      },
+    },
   },
   resolve: {
     alias: {

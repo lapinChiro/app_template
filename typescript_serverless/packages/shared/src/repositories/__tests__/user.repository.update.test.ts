@@ -169,10 +169,8 @@ describe('UserRepository - Update Operations', () => {
 
       expect(result).toEqual(updatedUser);
       expect(mockDbClient.update).toHaveBeenCalledWith(userId, {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        lastLoginAt: expect.any(String),
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        updatedAt: expect.any(String),
+        lastLoginAt: expect.any(String) as string,
+        updatedAt: expect.any(String) as string,
       });
     });
   });

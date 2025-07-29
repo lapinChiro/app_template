@@ -267,6 +267,16 @@ export class TokenValidator {
   ): Promise<{ valid: boolean; payload?: IdTokenPayload; error?: string }> {
     return this.validateIdToken(token, nonce);
   }
+
+  async verifyIdToken(idToken: string, nonce?: string): Promise<IdTokenPayload> {
+    const config: GoogleAuthConfig = {
+      clientId: this.clientId,
+      clientSecret: '', // Not needed for validation
+      redirectUri: '', // Not needed for validation
+      hostedDomain: this.hostedDomain,
+    };
+    return TokenValidator.verifyIdToken(idToken, config, nonce);
+  }
   
   static async getCertificates(): Promise<Record<string, string>> {
     const now = Date.now();

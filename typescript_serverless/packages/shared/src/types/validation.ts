@@ -1,7 +1,12 @@
 /**
  * Generic validation function type
  */
-export type ValidationFunction = (value: string) => boolean;
+export type ValidationFunction<T = string> = (value: T) => boolean;
+
+/**
+ * String validation function (most common use case)
+ */
+export type StringValidationFunction = ValidationFunction<string>;
 
 /**
  * Validation rule with custom error message
@@ -49,8 +54,10 @@ export class ValidatorBuilder<T = string> {
 /**
  * Create a composed validator from multiple validation functions
  */
-export function composeValidators(...validators: ValidationFunction[]): ValidationFunction {
-  return (value: string): boolean => {
+export function composeValidators<T = string>(
+  ...validators: Array<ValidationFunction<T>>
+): ValidationFunction<T> {
+  return (value: T): boolean => {
     return validators.every((validator) => validator(value));
   };
 }
@@ -58,8 +65,10 @@ export function composeValidators(...validators: ValidationFunction[]): Validati
 /**
  * Create a validator that checks if value matches any of the validators
  */
-export function anyValidator(...validators: ValidationFunction[]): ValidationFunction {
-  return (value: string): boolean => {
+export function anyValidator<T = string>(
+  ...validators: Array<ValidationFunction<T>>
+): ValidationFunction<T> {
+  return (value: T): boolean => {
     return validators.some((validator) => validator(value));
   };
 }

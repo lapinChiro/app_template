@@ -1,3 +1,17 @@
+---
+task_id: '03-03'
+task_name: 'Auth Middleware & Guards'
+category: 'authentication'
+priority: 'high'
+estimated_hours: 2
+depends_on: ['03-01']
+blocks_tasks: ['04-03', '05-01', '05-02']
+task_status: 'completed'
+developer: 'claude'
+started_at: '2025-07-29T11:03:30Z'
+completed_at: '2025-07-29T12:30:00Z'
+---
+
 # TASK-010: Auth Middleware & Guards
 
 **Priority**: High  

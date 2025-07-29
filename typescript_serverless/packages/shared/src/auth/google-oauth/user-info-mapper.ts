@@ -216,8 +216,7 @@ export class GoogleUserInfoMapper {
   }
   
   getUserDisplayName(user: { name?: string; firstName?: string; email: string }): string {
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    return user.name || user.firstName || user.email;
+    return user.name ?? user.firstName ?? user.email;
   }
 }
 
@@ -237,8 +236,7 @@ export class UserInfoMapper {
   }
   
   getUserDisplayName(user: { name?: string; firstName?: string; email: string }): string {
-    // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-    return user.name || user.firstName || user.email;
+    return user.name ?? user.firstName ?? user.email;
   }
   
   static mapGoogleUserToInternal(

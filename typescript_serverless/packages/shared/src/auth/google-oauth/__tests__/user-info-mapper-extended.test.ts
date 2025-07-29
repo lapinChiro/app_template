@@ -133,13 +133,19 @@ describe('UserInfoMapper - Extended Features', () => {
       const modifiedMapper = new GoogleUserInfoMapper();
       const mapperWithGetUserDisplayName = Object.assign(modifiedMapper, {
         getUserDisplayName: (user: { name?: string; firstName?: string; email: string }) => {
-          // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing
-          return user.name || user.firstName || user.email;
+          const trimmedName = user.name?.trim();
+          const trimmedFirstName = user.firstName?.trim();
+          return (trimmedName && trimmedName.length > 0 ? trimmedName : undefined) ?? 
+                 (trimmedFirstName && trimmedFirstName.length > 0 ? trimmedFirstName : undefined) ?? 
+                 user.email;
         }
       });
 
       const internalUser = modifiedMapper.mapToInternalUser(googleUserInfo);
-      const displayName = mapperWithGetUserDisplayName.getUserDisplayName(internalUser);
+      const displayName = mapperWithGetUserDisplayName.getUserDisplayName({
+        name: internalUser.name,
+        email: internalUser.email,
+      });
 
       expect(displayName).toBe('user@example.com');
     });

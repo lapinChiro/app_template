@@ -1,1 +1,1 @@
-@prompt.md に従って開発を行ってください。
+@prompt.md に従って開発を行ってください。 ultrathink

@@ -69,6 +69,13 @@ Use Task tool with subagent_type: "test", prompt: "red [FULL_PATH/component_name
 Use Task tool with subagent_type: "test", prompt: "green"                            # Verify test passes
 Use Task tool with subagent_type: "test", prompt: "blue"                             # Refactor with tests
 
+# TDD Completion Requirements (t_wada's standards)
+# ✅ lint - ZERO errors allowed
+# ✅ test - ALL tests must pass
+# ✅ typecheck - ZERO errors allowed
+# ✅ build - Must complete successfully
+# CRITICAL: All four checks MUST pass before marking task complete
+
 # Quality Assurance
 Use Task tool with subagent_type: "qa"                     # Full quality analysis
 Use Task tool with subagent_type: "qa", prompt: "quick"    # Quick check with auto-fix during TDD (MANDATORY after test:green and test:blue)
@@ -223,6 +230,18 @@ Use Task tool with subagent_type: "tracker", prompt: "summary"
 The tracker agent automatically manages task progress, including status transitions, time tracking, dependencies, quality metrics, technical decisions, and file changes.
 
 ## Quality Validation
+
+### Core Requirements
+
+- ✅ **ALL quality checks MUST pass with ZERO errors**
+  - lint, test, typecheck, build - all must complete without any errors
+  - No eslint-disable comments allowed in completed tasks
+- ✅ **Test code quality MUST exceed production code quality**
+  - No `any` types in test files
+  - Type-safe mocks required
+  - Complete type coverage
+
+### Checklist
 
 - ✅ Zero TypeScript errors
 - ✅ Zero ESLint errors  

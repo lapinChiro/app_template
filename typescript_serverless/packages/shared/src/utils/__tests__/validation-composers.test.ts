@@ -8,175 +8,239 @@ import {
   validatePasswordWithErrors,
 } from '../validation-composers';
 
-describe('validation composers', () => {
-  describe('isStrongPassword', () => {
-    const validPasswords = [
-      'Password123!',
-      'Complex@Pass1',
-      'Str0ng!Password',
-      'Test@123456',
-    ];
+// Password validation tests
+describe('isStrongPassword', () => {
+  interface PasswordTestCase {
+    password: string;
+    expected: boolean;
+    description: string;
+  }
 
-    const invalidPasswords = [
-      { password: 'short', reason: 'too short' },
-      { password: 'nouppercase123!', reason: 'no uppercase' },
-      { password: 'NOLOWERCASE123!', reason: 'no lowercase' },
-      { password: 'NoNumbers!', reason: 'no numbers' },
-      { password: 'NoSpecial123', reason: 'no special chars' },
-    ];
+  const passwordTestCases: PasswordTestCase[] = [
+    // Valid passwords
+    { password: 'Password123!', expected: true, description: 'contains all required characters' },
+    { password: 'Complex@Pass1', expected: true, description: 'complex password with all requirements' },
+    { password: 'Str0ng!Password', expected: true, description: 'strong password with mixed case and special' },
+    { password: 'Test@123456', expected: true, description: 'minimum requirements met' },
+    // Invalid passwords
+    { password: 'short', expected: false, description: 'too short (less than 8 chars)' },
+    { password: 'nouppercase123!', expected: false, description: 'missing uppercase letter' },
+    { password: 'NOLOWERCASE123!', expected: false, description: 'missing lowercase letter' },
+    { password: 'NoNumbers!', expected: false, description: 'missing numeric character' },
+    { password: 'NoSpecial123', expected: false, description: 'missing special character' },
+  ];
 
-    validPasswords.forEach((password) => {
-      it(`should accept strong password: ${password}`, () => {
-        expect(isStrongPassword(password)).toBe(true);
-      });
+  passwordTestCases.forEach(({ password, expected, description }) => {
+    const action = expected ? 'accept' : 'reject';
+    it(`should ${action} password: "${password}" - ${description}`, () => {
+      expect(isStrongPassword(password)).toBe(expected);
     });
+  });
+});
 
-    invalidPasswords.forEach(({ password, reason }) => {
-      it(`should reject weak password (${reason}): ${password}`, () => {
-        expect(isStrongPassword(password)).toBe(false);
+// Username validation tests
+describe('isValidUsername', () => {
+  interface UsernameTestCase {
+    username: string;
+    expected: boolean;
+    description: string;
+  }
+
+  const usernameTestCases: UsernameTestCase[] = [
+    // Valid usernames
+    { username: 'user123', expected: true, description: 'alphanumeric within length limits' },
+    { username: 'ABC', expected: true, description: 'minimum length (3 chars)' },
+    { username: 'a'.repeat(20), expected: true, description: 'maximum length (20 chars)' },
+    // Invalid usernames
+    { username: 'ab', expected: false, description: 'too short (less than 3 chars)' },
+    { username: 'user-name', expected: false, description: 'contains non-alphanumeric character (hyphen)' },
+    { username: 'user_name', expected: false, description: 'contains non-alphanumeric character (underscore)' },
+    { username: 'a'.repeat(21), expected: false, description: 'too long (more than 20 chars)' },
+    { username: 'user@123', expected: false, description: 'contains special character' },
+  ];
+
+  usernameTestCases.forEach(({ username, expected, description }) => {
+    const action = expected ? 'accept' : 'reject';
+    it(`should ${action} username: "${username}" - ${description}`, () => {
+      expect(isValidUsername(username)).toBe(expected);
+    });
+  });
+});
+
+// Contact validation tests
+describe('isValidContact', () => {
+  interface ContactTestCase {
+    contact: string;
+    expected: boolean;
+    type: 'email' | 'url' | 'invalid';
+  }
+
+  const contactTestCases: ContactTestCase[] = [
+    // Valid contacts
+    { contact: 'test@example.com', expected: true, type: 'email' },
+    { contact: 'user@domain.co.jp', expected: true, type: 'email' },
+    { contact: 'https://example.com', expected: true, type: 'url' },
+    { contact: 'http://contact.me', expected: true, type: 'url' },
+    // Invalid contacts
+    { contact: 'not-an-email-or-url', expected: false, type: 'invalid' },
+    { contact: 'ftp://example.com', expected: false, type: 'invalid' },
+    { contact: '@invalid.com', expected: false, type: 'invalid' },
+    { contact: '', expected: false, type: 'invalid' },
+    { contact: 'just-text', expected: false, type: 'invalid' },
+  ];
+
+  contactTestCases.forEach(({ contact, expected, type }) => {
+    const action = expected ? 'accept' : 'reject';
+    it(`should ${action} ${type} contact: "${contact}"`, () => {
+      expect(isValidContact(contact)).toBe(expected);
+    });
+  });
+});
+
+// Japanese name validation tests
+describe('isJapaneseName', () => {
+  interface JapaneseNameTestCase {
+    name: string;
+    expected: boolean;
+    characterType: string;
+  }
+
+  const japaneseNameTestCases: JapaneseNameTestCase[] = [
+    // Valid Japanese names
+    { name: 'たなか', expected: true, characterType: 'hiragana only' },
+    { name: 'タナカ', expected: true, characterType: 'katakana only' },
+    { name: '田中', expected: true, characterType: 'kanji only' },
+    { name: '田中 太郎', expected: true, characterType: 'kanji with space' },
+    { name: 'やまだ タロウ', expected: true, characterType: 'mixed hiragana and katakana' },
+    { name: '山田たろう', expected: true, characterType: 'mixed kanji and hiragana' },
+    // Invalid names
+    { name: 'tanaka', expected: false, characterType: 'romaji' },
+    { name: 'John', expected: false, characterType: 'english name' },
+    { name: '123', expected: false, characterType: 'numbers' },
+    { name: '', expected: false, characterType: 'empty string' },
+    { name: '   ', expected: false, characterType: 'whitespace only' },
+    { name: '田中@太郎', expected: false, characterType: 'contains special character' },
+  ];
+
+  japaneseNameTestCases.forEach(({ name, expected, characterType }) => {
+    const action = expected ? 'accept' : 'reject';
+    it(`should ${action} ${characterType}: "${name}"`, () => {
+      expect(isJapaneseName(name)).toBe(expected);
+    });
+  });
+});
+
+// File extension validation tests
+describe('file extension validators', () => {
+  interface FileTestCase {
+    filename: string;
+    expected: boolean;
+    description: string;
+  }
+
+  describe('isImageFile', () => {
+    const imageTestCases: FileTestCase[] = [
+      // Valid image files
+      { filename: 'photo.jpg', expected: true, description: 'JPEG image' },
+      { filename: 'image.png', expected: true, description: 'PNG image' },
+      { filename: 'test.gif', expected: true, description: 'GIF image' },
+      { filename: 'pic.webp', expected: true, description: 'WebP image' },
+      { filename: 'PHOTO.JPEG', expected: true, description: 'uppercase extension' },
+      { filename: 'file.with.dots.png', expected: true, description: 'filename with multiple dots' },
+      // Invalid files
+      { filename: 'document.pdf', expected: false, description: 'PDF document' },
+      { filename: 'video.mp4', expected: false, description: 'video file' },
+      { filename: 'script.js', expected: false, description: 'JavaScript file' },
+      { filename: 'noextension', expected: false, description: 'no file extension' },
+      { filename: '.jpg', expected: false, description: 'extension only' },
+    ];
+
+    imageTestCases.forEach(({ filename, expected, description }) => {
+      const action = expected ? 'accept' : 'reject';
+      it(`should ${action} ${description}: "${filename}"`, () => {
+        expect(isImageFile(filename)).toBe(expected);
       });
     });
   });
 
-  describe('isValidUsername', () => {
-    const testCases = [
-      { username: 'user123', expected: true },
-      { username: 'ABC', expected: true },
-      { username: 'ab', expected: false, reason: 'too short' },
-      { username: 'user-name', expected: false, reason: 'contains hyphen' },
-      { username: 'user_name', expected: false, reason: 'contains underscore' },
-      { username: 'a'.repeat(21), expected: false, reason: 'too long' },
+  describe('isDocumentFile', () => {
+    const documentTestCases: FileTestCase[] = [
+      // Valid document files
+      { filename: 'report.pdf', expected: true, description: 'PDF document' },
+      { filename: 'letter.doc', expected: true, description: 'Word document (old)' },
+      { filename: 'essay.docx', expected: true, description: 'Word document (new)' },
+      { filename: 'notes.txt', expected: true, description: 'text file' },
+      { filename: 'README.TXT', expected: true, description: 'uppercase extension' },
+      // Invalid files
+      { filename: 'image.jpg', expected: false, description: 'image file' },
+      { filename: 'video.mp4', expected: false, description: 'video file' },
+      { filename: 'script.js', expected: false, description: 'JavaScript file' },
+      { filename: 'archive.zip', expected: false, description: 'archive file' },
     ];
 
-    testCases.forEach(({ username, expected, reason }) => {
-      const description = expected
-        ? `should accept "${username}"`
-        : `should reject "${username}" (${reason})`;
+    documentTestCases.forEach(({ filename, expected, description }) => {
+      const action = expected ? 'accept' : 'reject';
+      it(`should ${action} ${description}: "${filename}"`, () => {
+        expect(isDocumentFile(filename)).toBe(expected);
+      });
+    });
+  });
+});
+
+// Password validation with error messages tests
+describe('validatePasswordWithErrors', () => {
+  interface ErrorTestCase {
+    password: string;
+    expectedErrors: string[];
+    description: string;
+  }
+
+  const errorTestCases: ErrorTestCase[] = [
+    {
+      password: 'weak',
+      expectedErrors: [
+        'Password must be at least 8 characters',
+        'Password must contain uppercase letter',
+        'Password must contain number',
+        'Password must contain special character',
+      ],
+      description: 'very weak password missing multiple requirements',
+    },
+    {
+      password: 'StrongP@ss123',
+      expectedErrors: [],
+      description: 'strong password meeting all requirements',
+    },
+    {
+      password: 'Password123',
+      expectedErrors: ['Password must contain special character'],
+      description: 'password missing only special character',
+    },
+    {
+      password: 'password@123',
+      expectedErrors: ['Password must contain uppercase letter'],
+      description: 'password missing only uppercase letter',
+    },
+    {
+      password: 'Pass@',
+      expectedErrors: [
+        'Password must be at least 8 characters',
+        'Password must contain number',
+      ],
+      description: 'short password missing number',
+    },
+  ];
+
+  errorTestCases.forEach(({ password, expectedErrors, description }) => {
+    it(`should validate password: "${password}" - ${description}`, () => {
+      const result = validatePasswordWithErrors(password);
       
-      it(description, () => {
-        expect(isValidUsername(username)).toBe(expected);
-      });
-    });
-  });
-
-  describe('isValidContact', () => {
-    const validContacts = [
-      'test@example.com',
-      'https://example.com',
-      'http://contact.me',
-      'user@domain.co.jp',
-    ];
-
-    const invalidContacts = [
-      'not-an-email-or-url',
-      'ftp://example.com',
-      '@invalid.com',
-      '',
-    ];
-
-    validContacts.forEach((contact) => {
-      it(`should accept valid contact: ${contact}`, () => {
-        expect(isValidContact(contact)).toBe(true);
-      });
-    });
-
-    invalidContacts.forEach((contact) => {
-      it(`should reject invalid contact: ${contact}`, () => {
-        expect(isValidContact(contact)).toBe(false);
-      });
-    });
-  });
-
-  describe('isJapaneseName', () => {
-    const validNames = [
-      'たなか',
-      'タナカ',
-      '田中',
-      '田中 太郎',
-      'やまだ タロウ',
-    ];
-
-    const invalidNames = [
-      'tanaka',
-      'John',
-      '123',
-      '',
-      '   ',
-    ];
-
-    validNames.forEach((name) => {
-      it(`should accept Japanese name: ${name}`, () => {
-        expect(isJapaneseName(name)).toBe(true);
-      });
-    });
-
-    invalidNames.forEach((name) => {
-      it(`should reject non-Japanese name: "${name}"`, () => {
-        expect(isJapaneseName(name)).toBe(false);
-      });
-    });
-  });
-
-  describe('file extension validators', () => {
-    describe('isImageFile', () => {
-      const validImages = ['photo.jpg', 'image.png', 'test.gif', 'pic.webp', 'PHOTO.JPEG'];
-      const invalidImages = ['document.pdf', 'video.mp4', 'script.js', 'noextension'];
-
-      validImages.forEach((file) => {
-        it(`should accept image file: ${file}`, () => {
-          expect(isImageFile(file)).toBe(true);
-        });
-      });
-
-      invalidImages.forEach((file) => {
-        it(`should reject non-image file: ${file}`, () => {
-          expect(isImageFile(file)).toBe(false);
-        });
-      });
-    });
-
-    describe('isDocumentFile', () => {
-      const validDocs = ['report.pdf', 'letter.doc', 'essay.docx', 'notes.txt'];
-      const invalidDocs = ['image.jpg', 'video.mp4', 'script.js'];
-
-      validDocs.forEach((file) => {
-        it(`should accept document file: ${file}`, () => {
-          expect(isDocumentFile(file)).toBe(true);
-        });
-      });
-
-      invalidDocs.forEach((file) => {
-        it(`should reject non-document file: ${file}`, () => {
-          expect(isDocumentFile(file)).toBe(false);
-        });
-      });
-    });
-  });
-
-  describe('validatePasswordWithErrors', () => {
-    it('should return all errors for weak password', () => {
-      const result = validatePasswordWithErrors('weak');
+      expect(result.isValid).toBe(expectedErrors.length === 0);
+      expect(result.errors).toHaveLength(expectedErrors.length);
       
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toContain('Password must be at least 8 characters');
-      expect(result.errors).toContain('Password must contain uppercase letter');
-      expect(result.errors).toContain('Password must contain number');
-      expect(result.errors).toContain('Password must contain special character');
-    });
-
-    it('should return no errors for strong password', () => {
-      const result = validatePasswordWithErrors('StrongP@ss123');
-      
-      expect(result.isValid).toBe(true);
-      expect(result.errors).toHaveLength(0);
-    });
-
-    it('should return specific errors for partially valid password', () => {
-      const result = validatePasswordWithErrors('Password123');
-      
-      expect(result.isValid).toBe(false);
-      expect(result.errors).toHaveLength(1);
-      expect(result.errors).toContain('Password must contain special character');
+      expectedErrors.forEach((error) => {
+        expect(result.errors).toContain(error);
+      });
     });
   });
 });
