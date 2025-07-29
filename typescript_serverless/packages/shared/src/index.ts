@@ -24,3 +24,6 @@ export {
   UserActivitySchema,
   UserStatsSchema,
 } from './schemas';
+
+// Export auth modules
+export * from './auth/google-oauth';

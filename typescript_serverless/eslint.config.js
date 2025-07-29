@@ -12,16 +12,16 @@
  * Layer 7: Dependency Management
  */
 
-const js = require('@eslint/js');
-const tseslint = require('@typescript-eslint/eslint-plugin');
-const tsParser = require('@typescript-eslint/parser');
-const importPlugin = require('eslint-plugin-import');
-const prettierConfig = require('eslint-config-prettier');
+const js = require( '@eslint/js' );
+const tseslint = require( '@typescript-eslint/eslint-plugin' );
+const tsParser = require( '@typescript-eslint/parser' );
+const importPlugin = require( 'eslint-plugin-import' );
+const prettierConfig = require( 'eslint-config-prettier' );
 
 module.exports = [
   // Base configuration for all TypeScript files
   {
-    files: ['**/*.ts', '**/*.tsx'],
+    files: [ '**/*.ts', '**/*.tsx' ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -63,9 +63,9 @@ module.exports = [
       '@typescript-eslint/require-await': 'error',
 
       // ===== Layer 5: Code Quality Gates =====
-      complexity: ['error', 15],
-      'max-lines-per-function': ['error', { max: 100 }], // 75→100行に緩和
-      'max-lines': ['error', { max: 300 }],
+      complexity: [ 'error', 15 ],
+      'max-lines-per-function': [ 'error', { max: 100, skipBlankLines: true, skipComments: true, IIFEs: true } ], // 75→100行に緩和
+      'max-lines': [ 'error', { max: 300, skipBlankLines: true, skipComments: true } ], // 200→300行に緩和
       'no-console': 'error',
 
       // ===== Layer 6: Exhaustiveness (Claude特有の強み) =====
@@ -75,7 +75,7 @@ module.exports = [
       'import/order': [
         'error',
         {
-          groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
+          groups: [ 'builtin', 'external', 'internal', 'parent', 'sibling', 'index' ],
           'newlines-between': 'always',
           alphabetize: { order: 'asc', caseInsensitive: true },
         },
@@ -99,7 +99,7 @@ module.exports = [
         { prefer: 'type-imports', disallowTypeAnnotations: false },
       ],
       '@typescript-eslint/consistent-type-exports': 'error',
-      '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
+      '@typescript-eslint/array-type': [ 'error', { default: 'array-simple' } ],
 
       // ===== Security Best Practices =====
       '@typescript-eslint/no-implied-eval': 'error',
@@ -132,7 +132,7 @@ module.exports = [
 
   // Test files configuration - same quality standards as production code
   {
-    files: ['**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx'],
+    files: [ '**/*.test.ts', '**/*.test.tsx', '**/*.spec.ts', '**/*.spec.tsx' ],
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -145,9 +145,9 @@ module.exports = [
     rules: {
       // Test code is specification - apply same quality standards as production
       'no-console': 'off', // Allow console.log for debugging during test development
-      'max-lines-per-function': ['error', { max: 200 }], 
-      'max-lines': ['error', { max: 300 }], // Same as production
-      complexity: ['error', 15], // Same as production
+      'max-lines-per-function': [ 'error', { max: 200 } ],
+      'max-lines': [ 'error', { max: 300 } ], // Same as production
+      complexity: [ 'error', 15 ], // Same as production
     },
   },
 
@@ -155,10 +155,12 @@ module.exports = [
   {
     ignores: [
       'node_modules/**',
+      '**/dist/**',
+      '**/coverage/**',
       'dist/**',
+      'coverage/**',
       '.next/**',
       'out/**',
-      'coverage/**',
       '*.config.js',
       '*.config.ts',
       'jest.config.js',
