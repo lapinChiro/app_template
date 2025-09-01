@@ -1,0 +1,30 @@
+# Lambda container image for both development and production
+FROM public.ecr.aws/lambda/nodejs:22 AS lambda-base
+
+# Install AWS Lambda Web Adapter
+COPY --from=public.ecr.aws/awsguru/aws-lambda-adapter:0.8.4 /lambda-adapter /opt/extensions/lambda-adapter
+
+# Set working directory
+WORKDIR ${LAMBDA_TASK_ROOT}
+
+# Copy package files
+COPY apps/backend/package*.json ./
+
+# Install all dependencies (including dev for build)
+RUN npm install
+
+# Copy application code
+COPY apps/backend/tsconfig.json ./
+COPY apps/backend/src ./src
+
+# Build TypeScript
+RUN npx tsc
+
+# Set AWS Lambda Web Adapter port
+ENV PORT=3000
+ENV AWS_LWA_ENABLE_COMPRESSION=true
+
+# Override the Lambda entrypoint to run our HTTP server
+# The Lambda Web Adapter will proxy requests to our server on PORT
+ENTRYPOINT []
+CMD ["node", "dist/index.js"]
