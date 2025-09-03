@@ -1,0 +1,6 @@
+voltagent/
+node_modules/
+coverage/
+error.log
+combined.log
+/dist/
