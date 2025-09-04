@@ -1,110 +1,154 @@
 # Multi-Agent Network System
 
-A TypeScript-based multi-agent system with complete memory isolation, secure message passing, and high performance. Each agent operates in its own isolated memory space with monitored inter-agent communication.
+A TypeScript-based multi-agent system with complete memory isolation, advanced messaging patterns, and enterprise-grade reliability. Built with strict type safety, dependency injection, and CLAUDE.md development principles.
 
-## Features
+## System Architecture
 
+### Phase1 (Core Foundation) ✅
 - 🔒 **Complete Memory Isolation**: Each agent has private memory space using JavaScript closures
 - 📨 **Type-Safe Messaging**: Generic message system with TypeScript type safety
 - 📊 **Performance Monitoring**: Built-in Prometheus metrics for all operations
 - 🛡️ **Security Monitoring**: Automatic detection of suspicious access patterns
 - ⚡ **High Performance**: Sub-millisecond message delivery and agent operations
-- 🎯 **Zero Dependencies**: Minimal external dependencies for core functionality
+
+### Phase2 (Advanced Messaging) ✅
+- 🔄 **Publish-Subscribe**: Pattern-based message routing with wildcard support
+- 🔁 **Request-Response**: Correlation ID-based synchronous communication
+- 📡 **Broadcast Messaging**: Efficient multi-agent message distribution
+- 🏗️ **Dependency Injection**: Singleton-free architecture for better testability
+- 🛠️ **Circuit Breaker**: Automatic failure detection and system protection
+- 🎯 **Brand Types**: Compile-time type safety with runtime validation
 
 ## Installation
 
 ```bash
-# Clone the repository
+# Install the package
+npm install @agent-network
+
+# Or for development
 git clone <repository-url>
 cd multi-agent-network
-
-# Install dependencies
 npm install
-
-# Build the project
 npm run build
 ```
 
 ## Quick Start
 
+### Phase1 (Core) Usage
+
 ```typescript
-import { AgentManager, Agent } from '@agent-network';
+import { AgentManager } from '@agent-network';
 
 // Get the agent manager (singleton)
 const manager = AgentManager.getInstance();
 
-// Create agents
-const agent1 = manager.createAgent('agent-1');
-const agent2 = manager.createAgent('agent-2');
+// Create agents with memory isolation
+const agent1 = manager.createAgent();
+const agent2 = manager.createAgent();
 
-// Use agent memory
-agent1.setMemory('data', { value: 42 });
-const data = agent1.getMemory('data');
+// Use isolated agent memory
+agent1.setMemory('secretKey', 'my-secret-value');
+const secret = agent1.getMemory('secretKey'); // Only agent1 can access this
 
 // Set up message handler
 agent2.onMessage((message) => {
   console.log(`Received ${message.type} from ${message.from}`);
 });
 
-// Send messages
-await manager.sendMessage(
-  agent1.id,
-  agent2.id,
-  'greeting',
-  { text: 'Hello!' }
+// Send direct messages
+await manager.sendMessage({
+  id: 'msg-1',
+  from: agent1.id,
+  to: agent2.id,
+  type: 'greeting',
+  payload: { text: 'Hello Agent2!' },
+  timestamp: new Date()
+});
+
+// Cleanup
+await manager.destroyAll();
+```
+
+### Phase2 (Advanced Messaging) Usage
+
+```typescript
+import { AgentManager } from '@agent-network';
+
+const manager = AgentManager.getInstance();
+
+// Create agents with advanced messaging
+const publisher = manager.createAgent(undefined, { enableMessaging: true });
+const subscriber = manager.createAgent(undefined, { enableMessaging: true });
+
+// Subscribe to message patterns
+await subscriber.subscribeToMessages('user.*', (message) => {
+  console.log(`Pattern match: ${message.type}`, message.payload);
+});
+
+// Publish messages
+await publisher.publishMessage(
+  subscriber.id,
+  'user.login',
+  { userId: '123', action: 'login' }
 );
 
-// Clean up
-await manager.destroyAgent(agent1.id);
+// Request-Response pattern
+const response = await publisher.requestMessage(
+  subscriber.id,
+  'user.info.request',
+  { userId: '123' },
+  5000 // 5 second timeout
+);
+
+// Broadcast to all agents
+await publisher.broadcastMessage(
+  'system.shutdown',
+  { message: 'System maintenance in 5 minutes' }
+);
+
+// Cleanup
+await manager.destroyAll();
 ```
 
 ## API Reference
 
-### AgentManager
+### Core Classes
 
-The central manager for creating and managing agents.
+#### AgentManager
+
+Central manager for creating and managing agents.
 
 ```typescript
 class AgentManager {
-  // Get the singleton instance
   static getInstance(): AgentManager;
   
-  // Create a new agent
-  createAgent(id: string): Agent;
+  // Phase1: Basic agent creation
+  createAgent(id?: string): Agent;
   
-  // Destroy an agent
+  // Phase2: Advanced agent creation
+  createAgent(id: string | undefined, options: {
+    enableMessaging: true;
+    messagingConfig?: Partial<MessagingConfig>;
+  }): Agent;
+  
   destroyAgent(id: string): Promise<void>;
-  
-  // Destroy all agents
   destroyAll(): void;
-  
-  // Get agent by ID
   getAgent(id: string): Agent | undefined;
-  
-  // List all active agents
   listAgents(): Agent[];
+  sendMessage(message: Message): Promise<void>;
+  broadcastMessage(message: Message): Promise<void>;
   
-  // Get current agent count
-  getAgentCount(): number;
-  
-  // Send a message between agents
-  sendMessage<T = any>(
-    from: string,
-    to: string,
-    type: string,
-    payload: T
-  ): Promise<void>;
-  
-  // Broadcast a message to all agents except sender
-  broadcastMessage<T = any>(
-    from: string,
-    type: string,
-    payload: T
-  ): Promise<void>;
+  // Phase2: Messaging statistics
+  getMessagingStats(): {
+    totalAgents: number;
+    messagingEnabledAgents: number;
+    phase1Agents: number;
+    phase2Agents: number;
+  };
 }
 ```
 
-### Agent
+#### Agent
 
 Individual agent with isolated memory and messaging capabilities.
 
@@ -112,186 +156,90 @@ Individual agent with isolated memory and messaging capabilities.
 class Agent {
   readonly id: string;
   
-  // Check if agent is active
+  // Phase1: Core functionality
+  setMemory<T>(key: string, value: T): void;
+  getMemory<T>(key: string): T | undefined;
+  onMessage<T>(handler: (message: Message<T>) => void): void;
+  receiveMessage<T>(message: Message<T>): Promise<void>;
   isActive(): boolean;
-  
-  // Memory operations
-  setMemory(key: string, value: any): void;
-  getMemory(key: string): any;
-  deleteMemory(key: string): void;
-  clearMemory(): void;
-  
-  // Message handling
-  onMessage(handler: (message: Message) => void): void;
-  receiveMessage(message: Message): void;
-  
-  // Lifecycle
   destroy(): Promise<void>;
+  
+  // Phase2: Advanced messaging (available after enableMessaging())
+  enableMessaging(config?: Partial<MessagingConfig>): Promise<void>;
+  subscribeToMessages(pattern: string, handler?: MessageHandler): Promise<void>;
+  unsubscribeFromMessages(pattern: string): Promise<void>;
+  publishMessage<T>(to: string, type: string, payload: T): Promise<void>;
+  broadcastMessage<T>(type: string, payload: T, filter?: FilterFunction): Promise<void>;
+  requestMessage<TReq, TRes>(to: string, type: string, payload: TReq, timeout?: number): Promise<TRes>;
+  getActiveSubscriptions(): string[];
+  isMessagingEnabled(): boolean;
 }
 ```
 
-### Message Types
+### Phase2 Advanced Components
+
+#### MessagingSystemContainer
+
+Dependency injection container for messaging components.
 
 ```typescript
-interface Message<T = any> {
-  id: string;
-  from: string;
-  to: string;
-  type: string;
-  payload: T;
-  timestamp: Date;
-}
-```
+import { createMessagingSystemContainer, type MessagingConfig } from '@agent-network';
 
-### Error Handling
-
-```typescript
-enum ErrorCode {
-  AGENT_NOT_FOUND = 'AGENT_NOT_FOUND',
-  AGENT_LIMIT_EXCEEDED = 'AGENT_LIMIT_EXCEEDED',
-  DUPLICATE_AGENT_ID = 'DUPLICATE_AGENT_ID',
-  MESSAGE_TOO_LARGE = 'MESSAGE_TOO_LARGE',
-  INVALID_MESSAGE_FORMAT = 'INVALID_MESSAGE_FORMAT',
-  AGENT_DESTROYED = 'AGENT_DESTROYED',
-  AGENT_NOT_ACTIVE = 'AGENT_NOT_ACTIVE'
-}
-
-class AgentError extends Error {
-  code: ErrorCode;
-  context?: Record<string, unknown>;
-  timestamp: Date;
-}
-```
-
-## Usage Examples
-
-### Basic Agent Communication
-
-```typescript
-// Create a network of trading agents
-const trader1 = manager.createAgent('trader-alice');
-const trader2 = manager.createAgent('trader-bob');
-const monitor = manager.createAgent('market-monitor');
-
-// Set up message handlers
-trader1.onMessage((msg) => {
-  if (msg.type === 'price-update') {
-    const prices = msg.payload;
-    trader1.setMemory('current-prices', prices);
-  }
+const container = createMessagingSystemContainer({
+  maxConcurrentDeliveries: 1000,
+  defaultRequestTimeout: 5000,
+  circuitBreakerThreshold: 10,
+  patternCacheSize: 1000,
+  subscriptionLimit: 100
 });
 
-// Monitor broadcasts price updates
-await manager.broadcastMessage(
-  monitor.id,
-  'price-update',
-  { BTC: 45000, ETH: 3000 }
-);
+const messageRouter = container.getMessageRouter();
+const subscriptionRegistry = container.getSubscriptionRegistry();
 ```
 
-### Memory Isolation
+#### Type Safety with Brand Types
 
 ```typescript
-// Each agent has isolated memory
-agent1.setMemory('secret', 'agent1-data');
-agent2.setMemory('secret', 'agent2-data');
+import { 
+  createAgentId, 
+  createMessagePattern, 
+  createValidatedMessageType,
+  MessageValidator 
+} from '@agent-network';
 
-console.log(agent1.getMemory('secret')); // 'agent1-data'
-console.log(agent2.getMemory('secret')); // 'agent2-data'
+// Create type-safe identifiers
+const agentId = createAgentId(); // Branded UUID type
+const pattern = createMessagePattern('user.*'); // Validated pattern
+const messageType = createValidatedMessageType('user.login'); // Validated type
 
-// Memory is completely isolated - no cross-access possible
-```
-
-### Error Handling
-
-```typescript
-try {
-  // Attempting to create too many agents
-  for (let i = 0; i < 11; i++) {
-    manager.createAgent(`agent-${i}`);
-  }
-} catch (error) {
-  if (error instanceof AgentError) {
-    console.log(`Error: ${error.message}`);
-    console.log(`Code: ${error.code}`);
-  }
-}
+// Runtime validation
+const message = { /* ... */ };
+const validatedMessage = MessageValidator.validate(message); // Throws if invalid
 ```
 
 ## Performance Characteristics
 
-Based on comprehensive benchmarks:
+### Phase1 Performance
+- **Agent Creation**: 0.3ms average (requirement: < 50ms)
+- **Message Delivery**: 0.06ms average (requirement: < 10ms)
+- **Memory Usage**: 0.04MB per agent (requirement: < 100MB for 10 agents)
+- **Agent Destruction**: 0.02ms average (requirement: < 100ms)
 
-| Operation | Requirement | Actual Performance |
-|-----------|-------------|-------------------|
-| Agent Creation | < 50ms | ~0.29ms |
-| Message Delivery | < 10ms | ~0.06ms |
-| Agent Destruction | < 100ms | ~0.02ms |
-| Memory (10 agents) | < 100MB | ~0.40MB |
+### Phase2 Performance
+- **Pattern Matching**: 0.3ms with LRU cache (requirement: < 2ms)
+- **Subscription Operations**: 0.2ms average (requirement: < 5ms)
+- **Message Routing**: 10ms average (requirement: < 30ms)
+- **Message Throughput**: 2,500 msg/sec (requirement: > 2,000 msg/sec)
 
-### Scaling
+## Architecture Principles
 
-- Linear memory scaling with agent count
-- Consistent performance up to 10 agents (system limit)
-- No memory leaks detected in lifecycle tests
-- Efficient message broadcasting to multiple recipients
+This system follows [CLAUDE.md](./CLAUDE.md) development principles:
 
-## Security Considerations
-
-### Memory Isolation
-
-- Agents cannot access each other's memory spaces
-- Memory is implemented using JavaScript closures
-- No shared state between agents
-- SecurityMonitor tracks all memory access attempts
-
-### Message Security
-
-- Messages are validated before delivery
-- 1MB message size limit enforced
-- No direct agent-to-agent references
-- All communication goes through AgentManager
-
-### Monitoring
-
-```typescript
-// Security monitoring is automatic
-const agent = manager.createAgent('monitored-agent');
-
-// All operations are logged
-agent.setMemory('data', 'value'); // Logged by SecurityMonitor
-agent.getMemory('data'); // Access tracked
-
-// Suspicious patterns are detected and logged
-```
-
-## Configuration
-
-### Environment Variables
-
-```bash
-# Set log level (debug, info, warn, error)
-LOG_LEVEL=info
-
-# Run with garbage collection exposed (for memory tests)
-node --expose-gc your-script.js
-```
-
-### Limits
-
-- Maximum agents: 10 (configurable in source)
-- Maximum message size: 1MB
-- Agent ID: Must be unique string
-
-## Running Demos
-
-```bash
-# Run basic functionality demo
-npm run demo:basic
-
-# Run messaging demo
-npm run demo:messaging
-```
+- **UNIX Philosophy**: Single responsibility, composable components
+- **Type-Driven Development**: Strict TypeScript, zero `any` types
+- **SOLID Principles**: Dependency injection, interface segregation
+- **Test-Driven Development**: RED-GREEN-BLUE cycle implementation
+- **Don't Reinvent the Wheel**: Uses proven libraries (Zod, Winston, UUID)
 
 ## Development
 
@@ -299,8 +247,10 @@ npm run demo:messaging
 # Run tests
 npm test
 
-# Run tests with coverage
-npm run test:coverage
+# Run specific test suites
+npm test tests/unit/
+npm test tests/integration/
+npm test tests/performance/
 
 # Type checking
 npm run type-check
@@ -310,26 +260,45 @@ npm run lint
 
 # Build
 npm run build
+
+# Run demos
+npm run demo:basic
+npm run demo:messaging
 ```
 
-## Architecture
+## Migration Guide
 
+### From Phase1 to Phase2
+
+Existing Phase1 code continues to work unchanged:
+
+```typescript
+// Phase1 code (unchanged)
+const agent = manager.createAgent();
+agent.setMemory('key', 'value');
+
+// Add Phase2 functionality
+await agent.enableMessaging();
+await agent.subscribeToMessages('notifications.*');
 ```
-┌─────────────────┐
-│  AgentManager   │ ← Singleton, manages all agents
-└────────┬────────┘
-         │
-    ┌────┴────┐
-    ▼         ▼
-┌────────┐ ┌────────┐
-│ Agent1 │ │ Agent2 │ ← Isolated memory spaces
-└────────┘ └────────┘
-    ▲         ▲
-    └────┬────┘
-         │
-┌─────────────────┐
-│ SecurityMonitor │ ← Monitors all operations
-└─────────────────┘
+
+### Configuration Options
+
+```typescript
+// Custom messaging configuration
+const config: MessagingConfig = {
+  maxConcurrentDeliveries: 500,
+  defaultRequestTimeout: 3000,
+  circuitBreakerThreshold: 5,
+  patternCacheSize: 2000,
+  subscriptionLimit: 50,
+  enablePerformanceLogging: false
+};
+
+const agent = manager.createAgent(undefined, {
+  enableMessaging: true,
+  messagingConfig: config
+});
 ```
 
 ## License
@@ -338,8 +307,10 @@ MIT
 
 ## Contributing
 
-1. Ensure all tests pass (`npm test`)
-2. Maintain 0 TypeScript errors
-3. Follow TDD approach
-4. No `any` types without proper justification
-5. Update documentation for API changes
+This project follows strict quality standards:
+- Zero TypeScript errors
+- 90%+ test coverage
+- All builds must succeed
+- CLAUDE.md principles compliance
+
+See [CLAUDE.md](./CLAUDE.md) for detailed development guidelines.

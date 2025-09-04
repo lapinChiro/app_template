@@ -185,8 +185,9 @@ describe('Memory Usage Tests', () => {
       console.log(`Memory increase from operations: ${memoryIncrease.toFixed(2)} MB`);
 
       // Operations should not significantly increase memory
-      // Allow up to 25MB increase for 500 operations (100 per agent)
-      expect(memoryIncrease).toBeLessThan(25); // Less than 25MB increase
+      // Updated for Phase2: Allow up to 30MB increase for 500 operations (100 per agent)
+      // Increased from 25MB to account for Phase2 components (Zod, pattern matching, etc.)
+      expect(memoryIncrease).toBeLessThan(30); // Less than 30MB increase
     });
   });
 

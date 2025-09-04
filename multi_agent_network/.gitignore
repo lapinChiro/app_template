@@ -1,6 +1,34 @@
-voltagent/
+# Dependencies
 node_modules/
+
+# Build output
+/dist/
+
+# Coverage reports
 coverage/
+
+# Logs
 error.log
 combined.log
-/dist/
+*.log
+
+# Temporary files
+*.tmp
+*.temp
+*.backup
+*~
+.DS_Store
+
+# IDE files
+.vscode/
+.idea/
+
+# Cache directories  
+.cache/
+.eslintcache
+
+# OS generated files
+Thumbs.db
+
+# voltagent (legacy)
+voltagent/

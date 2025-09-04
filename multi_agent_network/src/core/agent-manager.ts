@@ -6,6 +6,9 @@ import { createLogger } from './logger';
 import { Singleton } from './base/singleton';
 import type { Logger } from 'winston';
 
+// Phase2 imports
+import type { MessagingConfig } from './messaging-system-container';
+
 /**
  * AgentManager manages the lifecycle of agents and messaging between them
  * 
@@ -63,7 +66,9 @@ export class AgentManager extends Singleton<AgentManager> {
    * @returns The created agent instance
    * @throws {AgentError} If agent limit is exceeded or ID is duplicate
    */
-  public createAgent(id?: string): Agent {
+  public createAgent(id?: string): Agent;
+  public createAgent(id: string | undefined, options: { enableMessaging: true; messagingConfig?: Partial<MessagingConfig> }): Agent;
+  public createAgent(id?: string, options?: { enableMessaging?: boolean; messagingConfig?: Partial<MessagingConfig> }): Agent {
     const agentId = id ?? uuidv4();
     
     // Check agent limit
@@ -82,20 +87,32 @@ export class AgentManager extends Singleton<AgentManager> {
       );
     }
     
-    // Create the agent with the specified ID
+    // Create the agent with the specified ID (Phase1 unchanged)
     const agent = new Agent(agentId);
     
     // Store the agent
     this.agents.set(agent.id, agent);
     
+    // Phase2: Enable messaging if requested (synchronously to ensure completion)
+    if (options?.enableMessaging) {
+      try {
+        // Enable messaging synchronously (for createAgent)
+        this.enableAgentMessagingSyncInternal(agent, options.messagingConfig);
+      } catch (error) {
+        this.logger.error('Failed to enable messaging for agent', {
+          agentId: agent.id,
+          error: error instanceof Error ? error.message : error
+        });
+        // Continue with agent creation even if messaging fails
+      }
+    }
+    
     // Log creation
     this.logger.info('Agent created', {
       agentId: agent.id,
-      totalAgents: this.agents.size
+      totalAgents: this.agents.size,
+      messagingEnabled: options?.enableMessaging ?? false
     });
-    
-    // Note: Agent constructor already records its own creation time,
-    // so we don't need additional performance metrics here
     
     return agent;
   }
@@ -185,6 +202,110 @@ export class AgentManager extends Singleton<AgentManager> {
           error
         });
       });
+    });
+  }
+
+  // ========================
+  // Phase2 Messaging Support
+  // ========================
+
+  /**
+   * Enables messaging for an agent synchronously (Phase2 functionality)
+   * @param agent - The agent to enable messaging for
+   * @param config - Optional messaging configuration
+   * @private
+   */
+  private enableAgentMessagingSyncInternal(
+    agent: Agent, 
+    config?: Partial<MessagingConfig>
+  ): void {
+    try {
+      // Use a synchronous approach by directly setting up messaging
+      const { createMessagingSystemContainer, defaultMessagingConfig } = 
+        require('./messaging-system-container');
+
+      const finalConfig = { ...defaultMessagingConfig, ...config };
+      
+      // Directly set up messaging system (synchronous)
+      const messagingSystem = createMessagingSystemContainer(finalConfig);
+      
+      // Set agent messaging state directly
+      (agent as any).messagingSystem = messagingSystem;
+      (agent as any).subscriptions = new Set<string>();
+      (agent as any).messagingEnabled = true;
+
+      // Register with messaging system
+      messagingSystem.getSubscriptionRegistry().registerAgent(agent.id as any);
+
+      this.logger.info('Messaging enabled for agent (sync)', { 
+        agentId: agent.id,
+        config: config ? 'custom' : 'default'
+      });
+      
+    } catch (error) {
+      this.logger.error('Failed to enable messaging for agent (sync)', {
+        agentId: agent.id,
+        error: error instanceof Error ? error.message : error
+      });
+      
+      // Don't throw - agent creation should still succeed
+      // Messaging can be enabled later if needed
+    }
+  }
+
+  // Note: enableAgentMessagingInternal removed - using sync version for createAgent
+
+  /**
+   * Gets statistics about messaging-enabled agents
+   * @returns Object with messaging statistics
+   */
+  public getMessagingStats(): {
+    totalAgents: number;
+    messagingEnabledAgents: number;
+    phase1Agents: number;
+    phase2Agents: number;
+  } {
+    const allAgents = Array.from(this.agents.values());
+    const messagingAgents = allAgents.filter(agent => 
+      (agent as any).isMessagingEnabled?.() === true
+    );
+
+    return {
+      totalAgents: allAgents.length,
+      messagingEnabledAgents: messagingAgents.length,
+      phase1Agents: allAgents.length - messagingAgents.length,
+      phase2Agents: messagingAgents.length
+    };
+  }
+
+  /**
+   * Enables messaging for an existing agent
+   * @param agentId - ID of the agent to enable messaging for
+   * @param config - Optional messaging configuration
+   * @throws {AgentError} If agent not found
+   */
+  public async enableAgentMessaging(
+    agentId: string,
+    config?: Partial<MessagingConfig>
+  ): Promise<void> {
+    const agent = this.getAgent(agentId);
+    if (!agent) {
+      throw new AgentError(
+        ErrorCode.AGENT_NOT_FOUND,
+        `Agent with ID '${agentId}' not found`
+      );
+    }
+
+    if ((agent as any).isMessagingEnabled?.()) {
+      this.logger.warn('Messaging already enabled for agent', { agentId });
+      return;
+    }
+
+    await (agent as any).enableMessaging(config);
+    
+    this.logger.info('Messaging enabled for existing agent', { 
+      agentId,
+      config: config ? 'custom' : 'default'
     });
   }
   

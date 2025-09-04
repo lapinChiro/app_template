@@ -15,7 +15,19 @@ export enum ErrorCode {
   /** Performance metric exceeded threshold */
   PERFORMANCE_THRESHOLD_EXCEEDED = 'PERFORMANCE_THRESHOLD_EXCEEDED',
   /** Operation attempted on a destroyed agent */
-  AGENT_DESTROYED = 'AGENT_DESTROYED'
+  AGENT_DESTROYED = 'AGENT_DESTROYED',
+  
+  // Phase 2 error codes
+  /** Agent has exceeded the maximum number of subscriptions */
+  SUBSCRIPTION_LIMIT_EXCEEDED = 'SUBSCRIPTION_LIMIT_EXCEEDED',
+  /** Invalid subscription pattern format */
+  INVALID_SUBSCRIPTION_PATTERN = 'INVALID_SUBSCRIPTION_PATTERN',
+  /** Request timed out waiting for response */
+  REQUEST_TIMEOUT = 'REQUEST_TIMEOUT',
+  /** Request failed with error response */
+  REQUEST_FAILED = 'REQUEST_FAILED',
+  /** Message routing operation failed */
+  MESSAGE_ROUTING_FAILED = 'MESSAGE_ROUTING_FAILED'
 }
 
 /**
