@@ -1,0 +1,21 @@
+{
+  "name": "@axum-postgres/openapi-spec",
+  "version": "1.0.0",
+  "private": true,
+  "description": "OpenAPI specification and TypeScript type generation",
+  "main": "generated/types.ts",
+  "scripts": {
+    "generate-types": "openapi-typescript openapi.json -o generated/types.ts",
+    "build": "npm run generate-types",
+    "type-check": "tsc --noEmit generated/types.ts",
+    "clean": "rm -rf generated/"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^6.0.0",
+    "typescript": "^5.0.0"
+  },
+  "files": [
+    "generated/types.ts",
+    "openapi.json"
+  ]
+}

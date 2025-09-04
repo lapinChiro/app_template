@@ -1,0 +1,31 @@
+{
+  "name": "axum-postgres-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Rust + Axum + PostgreSQL project with TypeScript type sync",
+  "workspaces": [
+    "packages/*",
+    "apps/frontend"
+  ],
+  "scripts": {
+    "workspace-info": "npm ls --depth=0 --workspaces",
+    "install-all": "npm install",
+    "build": "npm run build --workspaces --if-present",
+    "type-check": "npm run type-check --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "generate-openapi": "cd apps/backend && cargo run --bin generate-openapi",
+    "generate-ts-types": "npm run generate-types --workspace=packages/openapi-spec",
+    "sync-types": "npm run generate-openapi && npm run generate-ts-types",
+    "dev": "npm run sync-types && docker-compose up -d"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  },
+  "author": "Claude Code",
+  "license": "MIT"
+}
