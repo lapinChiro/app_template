@@ -47,22 +47,25 @@ curl http://localhost:3000
 ## 開発環境
 
 ### 必要なツール
+
 - Rust 1.75+
 - Docker + Docker Compose  
 - PostgreSQL Client (psql)
 
 ### データベース設定
+
 - **Host**: localhost
 - **Port**: 5435
-- **Database**: promana_dev
+- **Database**: dev
 - **User**: postgres
 - **Password**: password
-- **Connection String**: `postgresql://postgres:password@localhost:5435/promana_dev`
+- **Connection String**: `postgresql://postgres:password@localhost:5435/dev`
 
 ### 環境変数
+
 ```bash
 # .env.example をコピーして設定
-DATABASE_URL=postgresql://postgres:password@localhost:5435/promana_dev
+DATABASE_URL=postgresql://postgres:password@localhost:5435/dev
 PORT=3000
 RUST_ENV=development
 RUST_LOG=info
@@ -82,6 +85,7 @@ axum_postgres/
 ## 開発フロー
 
 ### 1. データベース操作
+
 ```bash
 # PostgreSQL起動
 docker-compose up -d postgres
@@ -94,6 +98,7 @@ docker-compose down
 ```
 
 ### 2. Rust開発
+
 ```bash
 cd apps/backend
 
@@ -111,6 +116,7 @@ cargo fmt
 ```
 
 ### 3. テスト実行
+
 ```bash
 # 単体テスト
 cargo test
@@ -125,11 +131,13 @@ cargo test --test db_test
 ## API仕様
 
 API仕様の詳細は以下を参照：
+
 - `docs/api_specification.md` - 全エンドポイント仕様
 - `docs/database_schema.sql` - データベーススキーマ
 - `docs/environment_variables.md` - 環境変数一覧
 
 ### 主要エンドポイント
+
 - `GET /health` - ヘルスチェック
 - `GET /api/users` - ユーザー一覧
 - `POST /api/users` - ユーザー作成
@@ -140,6 +148,7 @@ API仕様の詳細は以下を参照：
 ## トラブルシューティング
 
 ### PostgreSQL接続エラー
+
 ```bash
 # コンテナ状態確認
 docker-compose ps
@@ -152,6 +161,7 @@ docker-compose logs postgres
 ```
 
 ### Rustビルドエラー
+
 ```bash
 # キャッシュクリア
 cargo clean
@@ -164,6 +174,7 @@ cargo build
 ```
 
 ### ポート競合
+
 ```bash
 # 使用中ポート確認
 lsof -i :3000

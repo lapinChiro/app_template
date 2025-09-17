@@ -49,9 +49,10 @@ docker compose -f docker/compose.development.yml logs -f
 ```
 
 **Services:**
-- Frontend: `promana_frontend` (Port 5173)
-- Backend: `promana_backend` (Port 3000) - HMR enabled with tsx watch
-- PostgreSQL: `promana_postgres` (Port 5435)
+
+- Frontend: `frontend` (Port 5173)
+- Backend: `backend` (Port 3000) - HMR enabled with tsx watch
+- PostgreSQL: `postgres` (Port 5435)
 
 ## Quality Assurance
 

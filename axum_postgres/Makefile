@@ -110,7 +110,7 @@ db-check:
 
 db-migrate:
 	@echo "🗄️  Running database migrations..."
-	cd apps/backend && PGPASSWORD=password psql -h localhost -p 5435 -U postgres -d promana_dev -f migrations/001_initial.sql
+	cd apps/backend && PGPASSWORD=password psql -h localhost -p 5435 -U postgres -d dev -f migrations/001_initial.sql
 
 # Show status
 status:

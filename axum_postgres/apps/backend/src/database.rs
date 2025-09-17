@@ -38,7 +38,7 @@ pub fn get_database_url() -> String {
     let port = env::var("DB_PORT").unwrap_or_else(|_| "5435".to_string());
     let user = env::var("DB_USER").unwrap_or_else(|_| "postgres".to_string());
     let password = env::var("DB_PASSWORD").unwrap_or_else(|_| "password".to_string());
-    let database = env::var("DB_NAME").unwrap_or_else(|_| "promana_dev".to_string());
+    let database = env::var("DB_NAME").unwrap_or_else(|_| "dev".to_string());
 
     format!("postgresql://{}:{}@{}:{}/{}", user, password, host, port, database)
 }

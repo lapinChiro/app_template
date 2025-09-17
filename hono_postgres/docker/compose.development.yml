@@ -2,11 +2,11 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:17.6
-    container_name: promana_postgres
+    container_name: postgres
     ports:
       - "5435:5432"
     environment:
-      POSTGRES_DB: promana_dev
+      POSTGRES_DB: dev
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: password
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
@@ -25,7 +25,7 @@ services:
     build:
       context: ../
       dockerfile: ./docker/Dockerfile.frontend
-    container_name: promana_frontend
+    container_name: frontend
     ports:
       - "5173:5173"
     volumes:
@@ -47,7 +47,7 @@ services:
 
   backend:
     image: node:22
-    container_name: promana_backend
+    container_name: backend
     ports:
       - "3000:3000"
       # Lambda Runtime Interface Emulator port for local testing
@@ -60,10 +60,10 @@ services:
       - PORT=3000
       - SERVER_TIMEOUT=120000
       # PostgreSQL settings
-      - DATABASE_URL=postgresql://postgres:password@postgres:5432/promana_dev
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/dev
       - DB_HOST=postgres
       - DB_PORT=5432
-      - DB_NAME=promana_dev
+      - DB_NAME=dev
       - DB_USER=postgres
       - DB_PASSWORD=password
       - DB_SSL=false

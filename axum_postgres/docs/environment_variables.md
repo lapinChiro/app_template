@@ -9,29 +9,32 @@
 ### バックエンド（Axum）環境変数
 
 #### データベース接続
+
 | 変数名 | 型 | デフォルト値 | 必須 | 説明 |
 |--------|----|-----------|----|------|
 | `DATABASE_URL` | string | - | ✅ | PostgreSQL接続文字列（完全形式） |
 | `DB_HOST` | string | `localhost` | ❌ | データベースサーバーホスト |
 | `DB_PORT` | string | `5432` | ❌ | データベースサーバーポート |
-| `DB_NAME` | string | `promana_dev` | ❌ | データベース名 |
+| `DB_NAME` | string | `dev` | ❌ | データベース名 |
 | `DB_USER` | string | `postgres` | ❌ | データベースユーザー名 |
 | `DB_PASSWORD` | string | `password` | ❌ | データベースパスワード |
 | `DB_SSL` | string | `false` | ❌ | SSL接続有効化 (`true`/`false`) |
 
 **DATABASE_URL形式例**:
+
 ```bash
 # 開発環境
-DATABASE_URL="postgresql://postgres:password@localhost:5435/promana_dev"
+DATABASE_URL="postgresql://postgres:password@localhost:5435/dev"
 
 # Docker環境  
-DATABASE_URL="postgresql://postgres:password@postgres:5432/promana_dev"
+DATABASE_URL="postgresql://postgres:password@postgres:5432/dev"
 
 # 本番環境
-DATABASE_URL="postgresql://user:pass@prod-host:5432/promana_prod?sslmode=require"
+DATABASE_URL="postgresql://user:pass@prod-host:5432/prod?sslmode=require"
 ```
 
 #### サーバー設定
+
 | 変数名 | 型 | デフォルト値 | 必須 | 説明 |
 |--------|----|-----------|----|------|
 | `PORT` | string | `3000` | ❌ | APIサーバー待機ポート |
@@ -39,6 +42,7 @@ DATABASE_URL="postgresql://user:pass@prod-host:5432/promana_prod?sslmode=require
 | `SERVER_TIMEOUT` | string | `120000` | ❌ | リクエストタイムアウト（ミリ秒） |
 
 #### 実行環境
+
 | 変数名 | 型 | デフォルト値 | 必須 | 説明 |
 |--------|----|-----------|----|------|
 | `RUST_ENV` | string | `development` | ❌ | 実行環境 (`development`/`production`) |
@@ -47,12 +51,14 @@ DATABASE_URL="postgresql://user:pass@prod-host:5432/promana_prod?sslmode=require
 ### フロントエンド（Vue.js）環境変数
 
 #### API通信設定  
+
 | 変数名 | 型 | デフォルト値 | 必須 | 説明 |
 |--------|----|-----------|----|------|
 | `VITE_API_BASE_URL` | string | `http://localhost:3000` | ❌ | バックエンドAPIのベースURL |
 | `VITE_API_TIMEOUT` | string | `120000` | ❌ | APIリクエストタイムアウト（ミリ秒） |
 
 #### アプリケーション設定
+
 | 変数名 | 型 | デフォルト値 | 必須 | 説明 |
 |--------|----|-----------|----|------|
 | `VITE_APP_VERSION` | string | `0.0.0` | ❌ | アプリケーションバージョン |
@@ -62,9 +68,10 @@ DATABASE_URL="postgresql://user:pass@prod-host:5432/promana_prod?sslmode=require
 ## 環境別設定例
 
 ### 開発環境 (.env.development)
+
 ```bash
 # Backend (Axum)
-DATABASE_URL=postgresql://postgres:password@localhost:5435/promana_dev
+DATABASE_URL=postgresql://postgres:password@localhost:5435/dev
 PORT=3000
 RUST_ENV=development
 RUST_LOG=debug
@@ -76,13 +83,14 @@ VITE_ENABLE_DEBUG=true
 ```
 
 ### Docker環境 (docker-compose.yml)
+
 ```yaml
 # Backend service
 environment:
-  - DATABASE_URL=postgresql://postgres:password@postgres:5432/promana_dev
+  - DATABASE_URL=postgresql://postgres:password@postgres:5432/dev
   - DB_HOST=postgres
   - DB_PORT=5432
-  - DB_NAME=promana_dev
+  - DB_NAME=dev
   - DB_USER=postgres
   - DB_PASSWORD=password
   - DB_SSL=false
@@ -96,9 +104,10 @@ environment:
 ```
 
 ### 本番環境 (.env.production)
+
 ```bash
 # Backend (Axum)
-DATABASE_URL=postgresql://prod_user:secure_pass@rds-endpoint:5432/promana_prod?sslmode=require
+DATABASE_URL=postgresql://prod_user:secure_pass@rds-endpoint:5432/prod?sslmode=require
 PORT=3000
 RUST_ENV=production
 RUST_LOG=info
@@ -112,6 +121,7 @@ VITE_ENABLE_DEBUG=false
 ## Axum実装での環境変数処理
 
 ### Rustでの読み込み方法
+
 ```rust
 use std::env;
 
@@ -130,6 +140,7 @@ let host = env::var("HOST")
 ```
 
 ### 設定構造体パターン
+
 ```rust
 use serde::Deserialize;
 
@@ -162,6 +173,7 @@ impl DatabaseConfig {
 ```
 
 ### dotenvy統合
+
 ```rust
 // main.rs
 use dotenvy::dotenv;
@@ -178,6 +190,7 @@ fn main() {
 ## 検証とテスト
 
 ### 環境変数検証スクリプト
+
 ```bash
 #!/bin/bash
 # scripts/validate_env.sh
@@ -204,6 +217,7 @@ echo "=== Validation completed ==="
 ```
 
 ### データベース接続テスト
+
 ```rust
 // tests/integration/database_test.rs
 #[tokio::test]
@@ -219,15 +233,17 @@ async fn test_database_connection() {
 ## セキュリティ考慮事項
 
 ### 機密情報の扱い
+
 - ❌ パスワードを平文で.envに保存
 - ✅ 本番環境では環境変数やSecrets Managerを使用
 - ✅ .env.example でテンプレート提供
 - ✅ .gitignoreで.envファイルを除外
 
 ### .env.example
+
 ```bash
 # Database (required)
-DATABASE_URL=postgresql://postgres:password@localhost:5435/promana_dev
+DATABASE_URL=postgresql://postgres:password@localhost:5435/dev
 
 # Server (optional)  
 PORT=3000
@@ -240,16 +256,18 @@ RUST_LOG=info
 ## トラブルシューティング
 
 ### よくある問題
+
 1. **DATABASE_URL未設定**: アプリケーション起動失敗
    - 解決: .envファイル作成またはexport
-   
+
 2. **ポート競合**: `PORT`設定済みだが起動失敗  
    - 解決: 別のポート番号を使用
-   
+
 3. **DB接続失敗**: ホスト/ポート/認証情報の誤り
    - 解決: 接続情報の再確認
 
 ### デバッグ用環境変数表示
+
 ```rust
 pub fn print_env_info() {
     println!("=== Environment Information ===");

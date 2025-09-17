@@ -9,7 +9,7 @@ echo "=== PostgreSQL Docker Environment Health Check ==="
 # Configuration
 DB_HOST="localhost"
 DB_PORT="5435"
-DB_NAME="promana_dev"
+DB_NAME="dev"
 DB_USER="postgres"
 DB_PASSWORD="password"
 DB_URL="postgresql://$DB_USER:$DB_PASSWORD@$DB_HOST:$DB_PORT/$DB_NAME"

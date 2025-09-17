@@ -8,8 +8,8 @@
 -- =============================================
 -- 1. Database Creation (for reference)
 -- =============================================
--- CREATE DATABASE promana_dev;
--- \c promana_dev;
+-- CREATE DATABASE dev;
+-- \c dev;
 
 -- =============================================
 -- 2. Main Tables

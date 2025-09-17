@@ -19,17 +19,17 @@ docker compose -f docker/compose.development.yml up -d
 
 ### Development Services
 
-- **Frontend** (`promana_frontend`): Port 5173
+- **Frontend** (`frontend`): Port 5173
   - Vue.js with Vite dev server
   - Hot Module Replacement (HMR) enabled
   - Volume mounted for live code updates
   
-- **Backend** (`promana_backend`): Port 3000
+- **Backend** (`backend`): Port 3000
   - Hono with tsx watch
   - Hot Module Replacement (HMR) enabled
   - Volume mounted for live code updates
   
-- **DynamoDB Local** (`promana_dynamodb`): Port 8000
+- **DynamoDB Local** (`dynamodb`): Port 8000
   - Local DynamoDB for development
   - Data persisted in `local-data/dynamodb/`
 
@@ -79,10 +79,10 @@ docker compose -f compose.development.yml logs -f backend
 
 ```bash
 # Access backend container shell
-docker exec -it promana_backend sh
+docker exec -it backend sh
 
 # Run npm commands in frontend container
-docker exec promana_frontend npm run lint
+docker exec frontend npm run lint
 ```
 
 ### Clean Up
